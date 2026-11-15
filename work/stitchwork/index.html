@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Stitchwork</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a drafting table. Cool paper, ink, one signal orange for anything that is running.
+   The product demo is the hero: a workflow you can drag, edit and run. */
+:root{
+  --paper:#f2f4f0;
+  --card:#ffffff;
+  --ink:#101413;
+  --mut:#5b6461;
+  --line:#dde1da;
+  --run:#ff5a1f;
+  --deep:#0e3b3a;
+  --ok:#17935a;
+  --display:"Bricolage Grotesque","Arial Narrow",system-ui,sans-serif;
+  --body:"Onest",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --ease:cubic-bezier(.23,1,.32,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 17px/1.55 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--run);outline-offset:3px;border-radius:6px}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:22px}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.035em;line-height:.98;text-wrap:balance}
+h2{font-size:clamp(2.2rem,5.4vw,4rem);font-weight:800}
+.tagline{font:500 .78rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--mut);margin:0 0 18px;display:flex;align-items:center;gap:10px}
+.tagline::before{content:"";width:22px;height:2px;background:var(--run)}
+.btn{font:600 .98rem var(--body);display:inline-flex;align-items:center;gap:8px;padding:13px 20px;border-radius:12px;border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;text-decoration:none;transition:transform .16s var(--ease),background-color .2s ease,color .2s ease}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.run{background:var(--run);border-color:var(--run);color:#fff}
+@media (hover:hover) and (pointer:fine){.btn:hover{background:var(--run);border-color:var(--run);color:#fff}.btn.ghost:hover{background:var(--ink);border-color:var(--ink);color:var(--paper)}.btn.run:hover{background:var(--ink);border-color:var(--ink)}}
+
+nav{display:flex;align-items:center;gap:26px;padding-block:20px}
+.logo{font:800 1.45rem var(--display);letter-spacing:-.04em;text-decoration:none;margin-right:auto;display:flex;align-items:center;gap:9px}
+.logo i{width:22px;height:22px;border-radius:6px;background:var(--run);display:grid;place-items:center}
+.logo i::before{content:"";width:10px;height:10px;border:2px solid #fff;border-radius:50%}
+nav a.l{text-decoration:none;font-size:.95rem;color:var(--mut)}
+nav a.l:hover{color:var(--ink)}
+
+/* hero */
+.hero{padding:34px 0 30px}
+.hero .top{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,.7fr);gap:30px;align-items:end}
+h1{font-size:clamp(3.1rem,9.6vw,7.6rem);font-weight:800}
+h1 em{font-style:normal;color:var(--run);position:relative;white-space:nowrap}
+h1 em svg{position:absolute;left:0;bottom:-.1em;width:100%;height:.22em;overflow:visible}
+h1 em path{fill:none;stroke:var(--run);stroke-width:5;stroke-linecap:round;stroke-dasharray:420;animation:draw 1s .5s var(--ease) backwards}
+@keyframes draw{from{stroke-dashoffset:420}}
+.hero .side p{margin:0 0 20px;color:var(--mut);font-size:1.1rem;max-width:36ch}
+.hero .side .row{display:flex;gap:10px;flex-wrap:wrap}
+
+/* workflow canvas */
+.flowcard{margin-top:38px;border:1.5px solid var(--ink);border-radius:22px;background:var(--card);overflow:hidden;box-shadow:8px 8px 0 var(--ink)}
+.flowbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-bottom:1.5px solid var(--ink);font:500 .82rem var(--mono)}
+.flowbar .name{margin-right:auto;display:flex;align-items:center;gap:10px}
+.flowbar .dot{width:9px;height:9px;border-radius:50%;background:var(--ok)}
+.flowbar label{color:var(--mut)}
+.flowbar select{font:500 .82rem var(--mono);padding:7px 10px;border-radius:9px;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);max-width:100%}
+.flowbar .btn{padding:8px 14px;font-size:.86rem;border-radius:9px}
+.flow{position:relative;height:440px;background-image:radial-gradient(var(--line) 1.2px,transparent 1.2px);background-size:22px 22px;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.flow svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.edge{fill:none;stroke:#b9c0b8;stroke-width:2;transition:stroke .3s ease,opacity .3s ease}
+.edge.live{stroke:var(--run)}
+.edge.skip{opacity:.3;stroke-dasharray:4 6}
+.pulse{fill:var(--run)}
+.elabel{font:500 11px var(--mono);fill:var(--mut)}
+.node{position:absolute;width:188px;padding:12px 14px;border:1.5px solid var(--ink);border-radius:14px;background:var(--card);cursor:grab;touch-action:none;
+  box-shadow:3px 3px 0 var(--ink);transition:box-shadow .2s var(--ease),border-color .3s ease,opacity .3s ease,background-color .3s ease}
+.node.drag{cursor:grabbing;box-shadow:7px 7px 0 var(--ink);z-index:5}
+.node .k{font:500 .66rem var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--mut);display:flex;align-items:center;gap:7px}
+.node .k i{width:8px;height:8px;border-radius:2px;background:var(--c,var(--ink))}
+.node b{display:block;font:700 1.02rem/1.2 var(--display);letter-spacing:-.02em;margin:5px 0 2px}
+.node span.s{display:block;font-size:.8rem;color:var(--mut);min-height:1.3em}
+.node.on{border-color:var(--run);box-shadow:3px 3px 0 var(--run)}
+.node.on span.s{color:var(--run)}
+.node.done{background:#f1faf5;border-color:var(--ok);box-shadow:3px 3px 0 var(--ok)}
+.node.done span.s{color:var(--ok)}
+.node.skip{opacity:.4}
+.log{border-top:1.5px solid var(--ink);background:var(--ink);color:#d7ddd8;font:400 .8rem/1.7 var(--mono);padding:14px 18px;height:132px;overflow:auto}
+.log div b{color:var(--run);font-weight:500}
+.log div i{font-style:normal;color:#7fd8a8}
+.hint{font:400 .78rem var(--mono);color:var(--mut);margin:14px 2px 0}
+
+/* strip */
+.strip{padding:70px 0 20px}
+.apps{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px;list-style:none;padding:0}
+.apps li{font:500 .9rem var(--mono);padding:10px 16px;border:1.5px solid var(--line);border-radius:99px;background:var(--card)}
+
+/* bento */
+section{padding:90px 0}
+.bento{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:18px;margin-top:44px}
+.cell{border:1.5px solid var(--ink);border-radius:20px;background:var(--card);padding:26px;display:flex;flex-direction:column;gap:10px;min-height:300px;overflow:hidden}
+.cell h3{font-size:1.6rem;font-weight:700}
+.cell p{margin:0;color:var(--mut);max-width:40ch}
+.cell .demo{margin-top:auto;padding-top:18px}
+.c1{grid-column:span 4}.c2{grid-column:span 2;background:var(--deep);color:#eaf3ef;border-color:var(--deep)}.c2 p{color:#a9c4bd}
+.c3{grid-column:span 3}.c4{grid-column:span 3;background:var(--run);border-color:var(--run);color:#fff}.c4 p{color:#ffe2d6}
+.prompt{font:400 .95rem/1.5 var(--mono);border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--paper);min-height:4.4em}
+.prompt .cur{display:inline-block;width:8px;height:1.1em;background:var(--run);vertical-align:-.2em;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+.steps{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;min-height:38px}
+.steps span{font:500 .8rem var(--mono);padding:7px 12px;border-radius:9px;background:var(--ink);color:var(--paper);opacity:0;transform:translateY(8px);transition:opacity .3s ease,transform .4s var(--ease)}
+.steps span.in{opacity:1;transform:none}
+.runs{list-style:none;margin:0;padding:0;display:grid;gap:9px;font:400 .8rem var(--mono)}
+.runs li{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center}
+.runs i{width:8px;height:8px;border-radius:50%;background:#7fd8a8}
+.runs li.bad i{background:var(--run)}
+.runs .bar{height:6px;border-radius:9px;background:rgba(255,255,255,.14);overflow:hidden}
+.runs .bar u{display:block;height:100%;background:#7fd8a8;width:var(--w);transform-origin:left;transform:scaleX(0);transition:transform .9s var(--ease)}
+.runs li.bad u{background:var(--run)}
+.in-view .runs .bar u{transform:none}
+.approve{border:1.5px solid var(--line);border-radius:14px;padding:16px;background:var(--paper)}
+.approve .msg{font-size:.92rem;margin:0 0 14px;color:var(--ink)}
+.approve .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.approve .btn{padding:8px 14px;font-size:.86rem;border-radius:9px}
+.approve .state{font:500 .8rem var(--mono);color:var(--mut)}
+.approve.ok{border-color:var(--ok);background:#f1faf5}
+.approve.ok .state{color:var(--ok)}
+.big3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.big3 div b{display:block;font:800 clamp(2rem,4.6vw,3.3rem)/1 var(--display);letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.big3 div span{font-size:.84rem;color:#ffe2d6}
+
+/* pricing */
+.ptop{display:flex;align-items:end;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.toggle{display:inline-flex;border:1.5px solid var(--ink);border-radius:99px;padding:4px;position:relative;background:var(--card)}
+.toggle button{position:relative;z-index:1;font:600 .9rem var(--body);padding:8px 18px;border:0;background:none;border-radius:99px;cursor:pointer;color:var(--ink);transition:color .2s ease}
+.toggle button[aria-pressed="true"]{color:var(--paper)}
+.toggle .thumb{position:absolute;top:4px;bottom:4px;left:4px;width:calc(50% - 4px);border-radius:99px;background:var(--ink);transition:transform .3s var(--ease)}
+.toggle.y .thumb{transform:translateX(100%)}
+.plans{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:40px}
+.plan{border:1.5px solid var(--ink);border-radius:20px;background:var(--card);padding:28px;display:flex;flex-direction:column;gap:16px}
+.plan.hot{background:var(--ink);color:var(--paper);box-shadow:8px 8px 0 var(--run)}
+.plan h3{font-size:1.4rem;font-weight:700}
+.plan .price{font:800 3.4rem/1 var(--display);letter-spacing:-.05em;font-variant-numeric:tabular-nums}
+.plan .price small{font:400 .9rem var(--body);letter-spacing:0;color:var(--mut)}
+.plan.hot .price small,.plan.hot li{color:#b8c1bc}
+.plan ul{list-style:none;margin:0;padding:0;display:grid;gap:9px;font-size:.95rem;color:var(--mut)}
+.plan li::before{content:"+ ";font-family:var(--mono);color:var(--run)}
+.plan .btn{margin-top:auto;justify-content:center}
+.plan.hot .btn{background:var(--run);border-color:var(--run);color:#fff}
+
+/* cta */
+.cta{background:var(--deep);color:#eaf3ef;border-radius:28px;padding:clamp(34px,7vw,80px);margin-bottom:40px}
+.cta h2{font-size:clamp(2.6rem,8vw,6rem)}
+.cta form{display:flex;gap:10px;flex-wrap:wrap;margin-top:30px}
+.cta input{flex:1 1 240px;font:400 1rem var(--body);padding:14px 16px;border-radius:12px;border:1.5px solid #3a6664;background:#0a2f2e;color:#fff}
+.cta input::placeholder{color:#7fa19b}
+.cta .note{font:400 .82rem var(--mono);color:#a9c4bd;margin:14px 0 0;min-height:1.4em}
+footer{padding:26px 0 40px;font:400 .82rem var(--mono);color:var(--mut);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+.rise{animation:rise .8s var(--ease) backwards;animation-delay:calc(var(--d,0) * 80ms)}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}}
+@media (max-width:860px){
+  .hero .top{grid-template-columns:1fr}
+  nav a.l{display:none}
+  .c1,.c2,.c3,.c4{grid-column:span 6}
+  .plans{grid-template-columns:1fr}
+  .flow{height:640px}
+  .node{width:150px;padding:10px 11px}
+  .flowcard{box-shadow:5px 5px 0 var(--ink)}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}html{scroll-behavior:auto}.runs .bar u{transform:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav>
+    <a class="logo" href="#top"><i></i>Stitchwork</a>
+    <a class="l" href="#features">Features</a>
+    <a class="l" href="#pricing">Pricing</a>
+    <a class="btn ghost" href="#start" style="padding:9px 16px;font-size:.9rem">Start free</a>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="top">
+      <h1 class="rise">Your busywork, on <em>autopilot.<svg viewBox="0 0 400 20" preserveAspectRatio="none" aria-hidden="true"><path d="M4 12 C80 2 160 18 240 9 S360 6 396 12"/></svg></em></h1>
+      <div class="side rise" style="--d:2">
+        <p>Describe a task in plain English. Stitchwork turns it into a workflow that reads, decides and acts across the apps your team already uses.</p>
+        <div class="row"><a class="btn" href="#start">Start free</a><a class="btn ghost" href="#demo">Try the demo</a></div>
+      </div>
+    </div>
+
+    <div class="flowcard rise" id="demo" style="--d:3">
+      <div class="flowbar">
+        <span class="name"><span class="dot"></span>lead-router.flow</span>
+        <label for="lead">Test with</label>
+        <select id="lead">
+          <option value="hot">Priya, wants a demo for 40 seats</option>
+          <option value="cold">Sam, asking if there is a student plan</option>
+        </select>
+        <button class="btn run" id="run" type="button">Run workflow</button>
+      </div>
+      <div class="flow" id="flow"><svg id="edges" aria-hidden="true"></svg></div>
+      <div class="log" id="log" aria-live="polite"><div>Ready. Drag the steps around, pick a test lead, then run the workflow.</div></div>
+    </div>
+    <p class="hint">This demo runs in your browser. Nothing is sent anywhere.</p>
+  </header>
+
+  <div class="strip">
+    <p class="tagline">Connects to the tools you already have</p>
+    <ul class="apps"><li>Email</li><li>Team chat</li><li>CRM</li><li>Spreadsheets</li><li>Docs</li><li>Payments</li><li>Storefront</li><li>Calendar</li><li>Help desk</li><li>Webhooks</li></ul>
+  </div>
+
+  <section id="features">
+    <p class="tagline">Features</p>
+    <h2>Built for the work nobody wants to do twice.</h2>
+    <div class="bento">
+      <article class="cell c1" id="c1">
+        <h3>Say it. It builds it.</h3>
+        <p>Write what should happen. Stitchwork drafts the steps, and you adjust anything it got wrong.</p>
+        <div class="demo"><div class="prompt"><span id="typed"></span><span class="cur"></span></div><div class="steps" id="steps"></div></div>
+      </article>
+      <article class="cell c2" id="c2">
+        <h3>Runs you can read</h3>
+        <p>Every run keeps a plain record of what it saw and why it decided.</p>
+        <div class="demo"><ul class="runs">
+          <li><i></i><div class="bar"><u style="--w:42%"></u></div>1.2s</li>
+          <li><i></i><div class="bar"><u style="--w:58%"></u></div>1.9s</li>
+          <li class="bad"><i></i><div class="bar"><u style="--w:90%"></u></div>retry</li>
+          <li><i></i><div class="bar"><u style="--w:36%"></u></div>1.0s</li>
+          <li><i></i><div class="bar"><u style="--w:50%"></u></div>1.6s</li>
+        </ul></div>
+      </article>
+      <article class="cell c3">
+        <h3>A human where it matters</h3>
+        <p>Add an approval step to anything that sends money, mail or promises.</p>
+        <div class="demo"><div class="approve" id="approve">
+          <p class="msg">Refund of $240 to order #1182. Reason given: arrived damaged.</p>
+          <div class="row"><button class="btn" id="ok" type="button">Approve</button><button class="btn ghost" id="undo" type="button">Hold</button><span class="state" id="state">Waiting for you</span></div>
+        </div></div>
+      </article>
+      <article class="cell c4" id="c4">
+        <h3>Time back, every week</h3>
+        <p>Illustrative figures for this concept site.</p>
+        <div class="demo big3">
+          <div><b data-n="11">0</b><span>hours saved per person</span></div>
+          <div><b data-n="3">0</b><span>minutes to a first workflow</span></div>
+          <div><b data-n="400">0</b><span>app actions ready to use</span></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="pricing">
+    <div class="ptop">
+      <div><p class="tagline">Pricing</p><h2>Pay for seats,<br>not for runs.</h2></div>
+      <div class="toggle" id="toggle"><span class="thumb"></span><button type="button" data-y="0" aria-pressed="true">Monthly</button><button type="button" data-y="1" aria-pressed="false">Yearly</button></div>
+    </div>
+    <div class="plans">
+      <article class="plan"><h3>Starter</h3><div class="price">$0</div><ul><li>3 workflows</li><li>500 runs a month</li><li>Community support</li></ul><a class="btn ghost" href="#start">Start free</a></article>
+      <article class="plan hot"><h3>Team</h3><div class="price">$<span id="p1">29</span> <small>per seat / month</small></div><ul><li>Unlimited workflows</li><li>Unlimited runs</li><li>Approval steps and run history</li><li>Shared workspace</li></ul><a class="btn" href="#start">Try Team</a></article>
+      <article class="plan"><h3>Scale</h3><div class="price">$<span id="p2">79</span> <small>per seat / month</small></div><ul><li>Everything in Team</li><li>Single sign-on</li><li>Audit log export</li><li>Priority support</li></ul><a class="btn ghost" href="#start">Talk to us</a></article>
+    </div>
+  </section>
+
+  <div class="cta" id="start">
+    <h2>Put the busywork down.</h2>
+    <form id="form"><label for="email" style="position:absolute;left:-9999px">Work email</label><input id="email" type="email" placeholder="you@company.com" required><button class="btn run" type="submit">Get started</button></form>
+    <p class="note" id="note"></p>
+  </div>
+
+  <footer><span>Stitchwork is a concept site. The product and its figures are fictional.</span><span>Designed and built by Abhiram Appani</span></footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const NS = "http://www.w3.org/2000/svg";
+
+/* ---------- workflow canvas ---------- */
+(function(){
+  const flow = $("#flow"), svg = $("#edges"), log = $("#log"), runBtn = $("#run"), leadSel = $("#lead");
+  const NODES = [
+    {id:"form",  k:"Trigger", c:"#101413", t:"New lead",          s:"Form submitted",        d:[3,40],  m:[5,2]},
+    {id:"ai",    k:"AI step", c:"#ff5a1f", t:"Qualify the lead",  s:"Reads and scores it",   d:[26,40], m:[50,15]},
+    {id:"if",    k:"Branch",  c:"#0e3b3a", t:"Score 70 or more?", s:"Decides the path",      d:[50,40], m:[5,31]},
+    {id:"crm",   k:"Action",  c:"#17935a", t:"Create a deal",     s:"In the CRM",            d:[77,7],  m:[50,47]},
+    {id:"chat",  k:"Action",  c:"#17935a", t:"Tell sales",        s:"In team chat",          d:[77,40], m:[5,63]},
+    {id:"mail",  k:"Action",  c:"#17935a", t:"Send a nurture email", s:"From the shared inbox", d:[77,73], m:[50,80]}
+  ];
+  const EDGES = [["form","ai"],["ai","if"],["if","crm","yes"],["if","chat","yes"],["if","mail","no"]];
+  const el = {}, paths = [];
+  const mobile = () => flow.clientWidth < 700;
+  NODES.forEach(n => {
+    const d = document.createElement("div"); d.className = "node"; d.style.setProperty("--c", n.c);
+    d.innerHTML = `<span class="k"><i></i>${n.k}</span><b>${n.t}</b><span class="s">${n.s}</span>`;
+    flow.appendChild(d); el[n.id] = d; n.el = d; n.sub = d.querySelector(".s");
+    let sx, sy, ox, oy, id = null;
+    d.addEventListener("pointerdown", e => { if (id !== null) return; id = e.pointerId; d.setPointerCapture(id); d.classList.add("drag"); sx = e.clientX; sy = e.clientY; ox = d.offsetLeft; oy = d.offsetTop; });
+    d.addEventListener("pointermove", e => {
+      if (e.pointerId !== id) return;
+      const x = Math.max(4, Math.min(flow.clientWidth - d.offsetWidth - 8, ox + e.clientX - sx)), y = Math.max(4, Math.min(flow.clientHeight - d.offsetHeight - 8, oy + e.clientY - sy));
+      d.style.left = x + "px"; d.style.top = y + "px"; n.moved = true; draw();
+    });
+    const up = e => { if (e.pointerId !== id) return; id = null; d.classList.remove("drag"); };
+    d.addEventListener("pointerup", up); d.addEventListener("pointercancel", up);
+  });
+  EDGES.forEach(([a,b,lab]) => {
+    const p = document.createElementNS(NS, "path"); p.setAttribute("class", "edge"); svg.appendChild(p);
+    const dot = document.createElementNS(NS, "circle"); dot.setAttribute("r", 4); dot.setAttribute("class", "pulse"); svg.appendChild(dot);
+    let t = null;
+    if (lab){ t = document.createElementNS(NS, "text"); t.setAttribute("class", "elabel"); t.textContent = lab; svg.appendChild(t); }
+    paths.push({a, b, p, dot, t, ph: Math.random()});
+  });
+  function layout(){
+    const m = mobile();
+    NODES.forEach(n => { if (n.moved) return; const c = m ? n.m : n.d; n.el.style.left = c[0] + "%"; n.el.style.top = c[1] + "%"; });
+    draw();
+  }
+  function draw(){
+    svg.setAttribute("viewBox", `0 0 ${flow.clientWidth} ${flow.clientHeight}`);
+    paths.forEach(e => {
+      const A = el[e.a], B = el[e.b];
+      const ac = [A.offsetLeft + A.offsetWidth/2, A.offsetTop + A.offsetHeight/2], bc = [B.offsetLeft + B.offsetWidth/2, B.offsetTop + B.offsetHeight/2];
+      let x1, y1, x2, y2, d;
+      if (Math.abs(bc[0] - ac[0]) > Math.abs(bc[1] - ac[1]) * 1.2){
+        const dir = bc[0] > ac[0] ? 1 : -1; x1 = ac[0] + dir*A.offsetWidth/2; y1 = ac[1]; x2 = bc[0] - dir*B.offsetWidth/2; y2 = bc[1];
+        const k = Math.max(30, Math.abs(x2 - x1) * .5); d = `M${x1} ${y1} C${x1 + dir*k} ${y1} ${x2 - dir*k} ${y2} ${x2} ${y2}`;
+      } else {
+        const dir = bc[1] > ac[1] ? 1 : -1; x1 = ac[0]; y1 = ac[1] + dir*A.offsetHeight/2; x2 = bc[0]; y2 = bc[1] - dir*B.offsetHeight/2;
+        const k = Math.max(24, Math.abs(y2 - y1) * .5); d = `M${x1} ${y1} C${x1} ${y1 + dir*k} ${x2} ${y2 - dir*k} ${x2} ${y2}`;
+      }
+      e.p.setAttribute("d", d); e.len = e.p.getTotalLength();
+      if (e.t){ const q = e.p.getPointAtLength(e.len * .5); e.t.setAttribute("x", q.x + 6); e.t.setAttribute("y", q.y - 6); }
+    });
+  }
+  function tick(ms){
+    paths.forEach(e => {
+      if (!e.len || e.p.classList.contains("skip")){ e.dot.setAttribute("opacity", 0); return; }
+      const speed = e.p.classList.contains("live") ? 900 : 2600, t = ((ms / speed) + e.ph) % 1, q = e.p.getPointAtLength(t * e.len);
+      e.dot.setAttribute("cx", q.x); e.dot.setAttribute("cy", q.y); e.dot.setAttribute("opacity", e.p.classList.contains("live") ? 1 : .35);
+    });
+    requestAnimationFrame(tick);
+  }
+  const wait = ms => new Promise(r => setTimeout(r, reduce ? 60 : ms));
+  const say = html => { const d = document.createElement("div"); d.innerHTML = html; log.appendChild(d); log.scrollTop = log.scrollHeight; };
+  const edge = (a,b) => paths.find(e => e.a === a && e.b === b).p;
+  function reset(){
+    NODES.forEach(n => { n.el.classList.remove("on","done","skip"); n.sub.textContent = n.s; });
+    paths.forEach(e => e.p.classList.remove("live","skip"));
+  }
+  async function step(id, working, done, ms){
+    const n = NODES.find(x => x.id === id); n.el.classList.add("on"); n.sub.textContent = working; await wait(ms);
+    n.el.classList.remove("on"); n.el.classList.add("done"); n.sub.textContent = done;
+  }
+  let busy = false;
+  runBtn.addEventListener("click", async () => {
+    if (busy) return; busy = true; runBtn.disabled = true; runBtn.textContent = "Running";
+    reset(); log.innerHTML = "";
+    const hot = leadSel.value === "hot", score = hot ? 86 : 31;
+    say(`<b>run</b> lead-router started`);
+    await step("form", "Receiving", "Received", 600); say(`form: "${leadSel.options[leadSel.selectedIndex].text}"`);
+    edge("form","ai").classList.add("live");
+    await step("ai", "Thinking", `Score ${score}`, 1300); say(`ai: intent is <i>${hot ? "sales demo" : "pricing question"}</i>, score <i>${score}</i>`);
+    edge("ai","if").classList.add("live");
+    await step("if", "Checking", hot ? "Yes" : "No", 600); say(`branch: ${score} ${hot ? "is" : "is not"} 70 or more`);
+    if (hot){
+      edge("if","crm").classList.add("live"); edge("if","chat").classList.add("live"); edge("if","mail").classList.add("skip"); el.mail.classList.add("skip");
+      await Promise.all([step("crm", "Creating", "Deal created", 800), step("chat", "Posting", "Sales notified", 1000)]);
+      say(`crm: deal created · chat: posted to #sales`);
+    } else {
+      edge("if","mail").classList.add("live"); ["crm","chat"].forEach(k => { edge("if",k).classList.add("skip"); el[k].classList.add("skip"); });
+      await step("mail", "Writing", "Email queued", 1000); say(`mail: nurture email queued`);
+    }
+    say(`<i>done</i> in ${hot ? "3.4" : "3.1"}s. Change the test lead and run it again.`);
+    busy = false; runBtn.disabled = false; runBtn.textContent = "Run again";
+  });
+  new ResizeObserver(layout).observe(flow);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(draw);
+  layout(); if (!reduce) requestAnimationFrame(tick);
+})();
+
+/* ---------- in-view helpers ---------- */
+function onView(sel, fn){
+  const t = $(sel);
+  if (!("IntersectionObserver" in window)) return fn(t);
+  const io = new IntersectionObserver(es => { if (es[0].isIntersecting){ io.disconnect(); fn(t); } }, {threshold:.35}); io.observe(t);
+}
+/* prompt typing */
+onView("#c1", () => {
+  const text = "When a lead fills in the form, score it and tell sales if it's hot.", out = $("#typed"), steps = $("#steps");
+  const S = ["Trigger: new lead", "AI: score intent", "Branch: 70 or more", "Action: tell sales"];
+  steps.innerHTML = S.map(s => `<span>${s}</span>`).join("");
+  if (reduce){ out.textContent = text; [...steps.children].forEach(s => s.classList.add("in")); return; }
+  let i = 0;
+  (function type(){ out.textContent = text.slice(0, ++i); if (i < text.length) setTimeout(type, 28); else [...steps.children].forEach((s,k) => setTimeout(() => s.classList.add("in"), 250 + k*220)); })();
+});
+onView("#c2", t => t.classList.add("in-view"));
+onView("#c4", t => t.querySelectorAll("[data-n]").forEach(b => {
+  const n = +b.dataset.n; if (reduce){ b.textContent = n; return; }
+  const t0 = performance.now();
+  (function f(now){ const p = Math.min((now - t0) / 1200, 1), e = 1 - Math.pow(1 - p, 4); b.textContent = Math.round(n * e); if (p < 1) requestAnimationFrame(f); })(t0);
+}));
+/* approval */
+$("#ok").addEventListener("click", () => { $("#approve").classList.add("ok"); $("#state").textContent = "Approved. Refund sent to the queue."; });
+$("#undo").addEventListener("click", () => { $("#approve").classList.remove("ok"); $("#state").textContent = "On hold. Nothing was sent."; });
+/* pricing toggle */
+$("#toggle").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return; const y = b.dataset.y === "1";
+  $("#toggle").classList.toggle("y", y); $("#toggle").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  $("#p1").textContent = y ? 23 : 29; $("#p2").textContent = y ? 63 : 79;
+});
+/* signup */
+$("#form").addEventListener("submit", e => { e.preventDefault(); $("#note").textContent = "This is a concept site, so nothing was sent or saved."; });
+</script>
+</body>
+</html>

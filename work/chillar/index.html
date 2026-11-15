@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chillar</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@500;700;900&family=Onest:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a friendly money app, so everything is round, chunky and has a hard ink shadow like a sticker.
+   Violet is the brand, yellow is money, mint means settled. The splitter on the page really works. */
+:root{
+  --bg:#f3f0ff; --ink:#17132b; --muted:#665f82; --card:#ffffff; --violet:#6747ff; --sun:#ffd84d; --mint:#2fd39a; --coral:#ff6b6b;
+  --display:"Gabarito",system-ui,sans-serif; --body:"Onest",system-ui,sans-serif; --ease:cubic-bezier(.23,1,.32,1);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:90px}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--violet);outline-offset:3px;border-radius:10px}
+.wrap{max-width:1140px;margin:0 auto;padding-inline:24px}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.03em;line-height:1;text-wrap:balance}
+h2{font-size:clamp(2.2rem,5.2vw,3.8rem);font-weight:900}
+.kick{font:600 .8rem var(--body);letter-spacing:.12em;text-transform:uppercase;color:var(--violet);margin:0 0 14px}
+.lede{color:var(--muted);max-width:52ch;margin:16px 0 0;font-size:1.08rem}
+section{padding-block:100px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:700 1.02rem/1 var(--display);padding:16px 24px;border-radius:16px;border:2.5px solid var(--ink);background:var(--card);color:var(--ink);text-decoration:none;cursor:pointer;box-shadow:4px 4px 0 var(--ink);transition:transform .16s var(--ease),box-shadow .16s var(--ease)}
+.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}
+.btn.v{background:var(--violet);color:#fff}.btn.y{background:var(--sun)}
+.btn.sm{padding:11px 16px;font-size:.92rem;border-radius:12px;box-shadow:3px 3px 0 var(--ink)}
+@media (hover:hover){.btn:hover{transform:translate(-1px,-1px);box-shadow:5px 5px 0 var(--ink)}.btn:active{transform:translate(4px,4px);box-shadow:0 0 0 var(--ink)}}
+.sticker{border:2.5px solid var(--ink);border-radius:24px;background:var(--card);box-shadow:6px 6px 0 var(--ink)}
+
+nav{position:sticky;top:0;z-index:20;background:rgba(243,240,255,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+nav .wrap{display:flex;align-items:center;gap:26px;padding-block:14px}
+.logo{display:flex;align-items:center;gap:9px;font:900 1.5rem var(--display);letter-spacing:-.04em;text-decoration:none;margin-right:auto}
+.logo i{width:28px;height:28px;border-radius:50%;background:var(--sun);border:2.5px solid var(--ink);display:grid;place-items:center;font:900 .9rem var(--display);font-style:normal}
+nav a.l{text-decoration:none;font-weight:500;font-size:.95rem}
+
+.hero{position:relative;padding-block:56px 90px;overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:30px;align-items:center}
+.badge{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.86rem;background:var(--card);border:2px solid var(--ink);border-radius:99px;padding:6px 14px;margin-bottom:26px}
+.badge i{width:8px;height:8px;border-radius:50%;background:var(--mint)}
+h1{font-size:clamp(2.7rem,6.2vw,5rem);font-weight:900;line-height:.96}
+h1 span{position:relative;white-space:nowrap;color:var(--violet)}
+h1 svg{position:absolute;left:-2%;bottom:-.16em;width:104%;height:.26em;overflow:visible}
+h1 svg path{fill:none;stroke:var(--sun);stroke-width:9;stroke-linecap:round;stroke-dasharray:640;animation:draw 1s .5s var(--ease) backwards}
+@keyframes draw{from{stroke-dashoffset:640}}
+.hero p{font-size:1.2rem;color:var(--muted);max-width:42ch;margin:28px 0 32px}
+.cta{display:flex;gap:14px;flex-wrap:wrap}
+.blob{position:absolute;border-radius:50%;z-index:-1}
+.b1{width:520px;height:520px;background:var(--sun);right:-120px;top:20px}
+.b2{width:180px;height:180px;background:var(--mint);right:38%;bottom:-70px}
+
+/* phone */
+.scene{position:relative;height:620px;perspective:1400px;display:grid;place-items:center}
+.phone{position:relative;width:288px;height:584px;border-radius:46px;border:10px solid var(--ink);background:#fbfaff;box-shadow:26px 34px 0 rgba(23,19,43,.16);transform-style:preserve-3d;transform:rotateY(-16deg) rotateX(7deg) rotateZ(3deg);will-change:transform;padding:18px 16px;display:flex;flex-direction:column;gap:12px;font-size:.84rem}
+.phone::before{content:"";position:absolute;left:50%;top:8px;width:84px;height:22px;margin-left:-42px;border-radius:99px;background:var(--ink)}
+.p-top{display:flex;align-items:center;justify-content:space-between;margin-top:26px}
+.p-top b{font:900 1.3rem var(--display);letter-spacing:-.03em}
+.avs{display:flex}.av{width:28px;height:28px;border-radius:50%;border:2px solid var(--ink);display:grid;place-items:center;font:700 .7rem var(--display);margin-left:-8px;background:var(--sun)}
+.av.m{background:var(--mint)}.av.c{background:var(--coral);color:#fff}.av.v{background:var(--violet);color:#fff}
+.bal{background:var(--violet);color:#fff;border-radius:22px;padding:16px;border:2px solid var(--ink)}
+.bal small{opacity:.8}.bal b{display:block;font:900 2.1rem/1.1 var(--display);letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.bal span{display:inline-block;margin-top:8px;background:var(--sun);color:var(--ink);font-weight:600;font-size:.72rem;border-radius:99px;padding:3px 10px}
+.rows{display:grid;gap:8px;list-style:none;margin:0;padding:0}
+.rows li{display:flex;align-items:center;gap:10px;background:#fff;border:2px solid var(--ink);border-radius:16px;padding:9px 11px}
+.rows i{width:30px;height:30px;border-radius:10px;border:2px solid var(--ink);flex:none}
+.rows span{flex:1;line-height:1.25}.rows small{display:block;color:var(--muted);font-size:.7rem}.rows b{font:700 .9rem var(--display);font-variant-numeric:tabular-nums}
+.tabs{margin-top:auto;display:flex;justify-content:space-around;border-top:2px solid var(--ink);padding-top:10px;font-weight:600;font-size:.7rem;color:var(--muted)}
+.tabs b{color:var(--violet)}
+.float{position:absolute;padding:11px 15px;font-weight:600;font-size:.86rem;border-radius:16px;white-space:nowrap;will-change:transform}
+.f1{left:-10%;top:47%;background:var(--card)}.f2{right:-2%;bottom:20%;background:var(--mint)}
+.coin{position:absolute;width:58px;height:58px;border-radius:50%;background:var(--sun);border:2.5px solid var(--ink);box-shadow:4px 4px 0 var(--ink);display:grid;place-items:center;font:900 1.4rem var(--display);will-change:transform}
+.c1{right:6%;top:9%}.c2{left:8%;bottom:10%;width:42px;height:42px;font-size:1rem}
+
+/* splitter */
+.split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:28px;margin-top:46px;align-items:start}
+.box{padding:28px}
+.box h3{font-size:1.25rem;font-weight:700;margin-bottom:14px}
+.people{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.chip{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:.95rem;border:2px solid var(--ink);border-radius:99px;padding:6px 8px 6px 14px;background:var(--bg)}
+.chip button{width:22px;height:22px;border-radius:50%;border:0;background:var(--ink);color:#fff;font:700 .8rem var(--body);cursor:pointer;line-height:1}
+.inline{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+input,select{font:500 1rem var(--body);color:var(--ink);background:#fff;border:2px solid var(--ink);border-radius:12px;padding:10px 12px;min-width:0}
+.inline input{flex:1 1 120px}
+.exp{list-style:none;margin:0 0 14px;padding:0;display:grid;gap:8px}
+.exp li{display:flex;align-items:center;gap:12px;border:2px solid var(--ink);border-radius:14px;padding:10px 12px;background:var(--bg)}
+.exp span{flex:1}.exp small{display:block;color:var(--muted);font-size:.8rem}.exp b{font:700 1.05rem var(--display);font-variant-numeric:tabular-nums}
+.exp button{border:0;background:none;color:var(--muted);font:600 .8rem var(--body);cursor:pointer;text-decoration:underline}
+.addrow{display:grid;grid-template-columns:1.3fr .8fr 1fr auto;gap:8px}
+.out{background:var(--ink);color:#fff;position:sticky;top:90px}
+.out h3{color:var(--sun)}
+.tot{display:flex;justify-content:space-between;gap:16px;border-bottom:2px dashed rgba(255,255,255,.25);padding-bottom:16px;margin-bottom:16px;font-size:.9rem;color:#c9c4e0}
+.tot b{display:block;font:900 2rem/1.1 var(--display);color:#fff;font-variant-numeric:tabular-nums}
+.pay{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.pay li{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:14px;padding:12px 14px;font-weight:600;animation:pop .4s var(--ease) backwards}
+@keyframes pop{from{opacity:0;transform:translateY(8px) scale(.97)}}
+.pay svg{width:22px;height:12px;flex:none;stroke:var(--sun);fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pay b{margin-left:auto;font:900 1.15rem var(--display);color:var(--sun);font-variant-numeric:tabular-nums}
+.pay .none{background:var(--mint);color:var(--ink)}
+.err{color:var(--coral);font-weight:600;font-size:.9rem;min-height:1.4em;margin:8px 0 0}
+
+/* simplify */
+.simp{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.graph{padding:20px;background:var(--card)}
+.graph svg{width:100%;height:auto;display:block}
+.graph .e{fill:none;stroke:var(--ink);stroke-width:2.5;marker-end:url(#ah);transition:opacity .45s ease}
+.graph .e.new{stroke:var(--violet);stroke-width:4;marker-end:url(#ahv)}
+.graph text{font:700 15px var(--display);fill:var(--ink)}
+.graph .amt{font:600 13px var(--body);fill:var(--muted);transition:opacity .45s ease}
+.graph[data-s="1"] .old,.graph[data-s="0"] .nw{opacity:0}
+.count{font:900 clamp(3rem,7vw,5rem)/1 var(--display);color:var(--violet);margin:22px 0 6px;font-variant-numeric:tabular-nums}
+
+.feats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:46px}
+.feat{padding:26px;display:flex;flex-direction:column;gap:10px;min-height:290px}
+.feat:nth-child(1){background:var(--sun)}.feat:nth-child(2){background:var(--card)}.feat:nth-child(3){background:var(--mint)}
+.feat h3{font-size:1.5rem;font-weight:900;margin-top:auto}.feat p{margin:0;font-size:.98rem}
+.nudge{background:#fff;border:2px solid var(--ink);border-radius:16px 16px 16px 4px;padding:12px 14px;font-size:.92rem;font-weight:500;align-self:flex-start;max-width:90%}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.cal i{aspect-ratio:1;border-radius:8px;border:2px solid var(--ink);background:var(--bg)}.cal i.on{background:var(--violet)}
+.tap{align-self:flex-start}
+
+.final{padding-block:0 100px}
+.final .in{background:var(--violet);color:#fff;border:2.5px solid var(--ink);border-radius:36px;box-shadow:10px 10px 0 var(--ink);padding:clamp(40px,8vw,90px) 28px;text-align:center}
+.final h2{font-size:clamp(2.6rem,7vw,5.2rem);max-width:13ch;margin:0 auto}.final .cta{justify-content:center;margin-top:34px}
+footer{padding-block:24px;font-size:.86rem;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;border-top:2px solid var(--ink);padding-top:20px}
+
+@media (max-width:900px){.hero .wrap,.split,.simp{grid-template-columns:1fr}.feats{grid-template-columns:1fr}.out{position:static}nav a.l{display:none}.scene{height:600px}.b1{width:380px;height:380px;top:auto;bottom:120px}}
+@media (max-width:560px){section{padding-block:70px}.addrow{grid-template-columns:1fr 1fr}.f1{left:0}.f2{right:0}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="logo" href="#top"><i>₹</i>Chillar</a>
+  <a class="l" href="#split">Try the splitter</a><a class="l" href="#simplify">How it works</a><a class="l" href="#features">Features</a>
+  <a class="btn sm v" href="#get">Get the app</a>
+</div></nav>
+
+<main id="top">
+<div class="hero" id="hero">
+  <span class="blob b1"></span><span class="blob b2"></span>
+  <div class="wrap">
+    <div>
+      <span class="badge"><i></i>Made for flatmates, trips and group dinners</span>
+      <h1>Split the bill, not the <span>friendship.<svg viewBox="0 0 600 30" preserveAspectRatio="none" aria-hidden="true"><path d="M6 20 C140 4 260 28 380 12 S540 10 594 18"/></svg></span></h1>
+      <p>Chillar keeps track of who paid for what and works out the fewest payments to settle up. No spreadsheets, no awkward reminders.</p>
+      <div class="cta"><a class="btn v" href="#get">Get the app</a><a class="btn" href="#split">Try the splitter</a></div>
+    </div>
+    <div class="scene" id="scene" aria-hidden="true">
+      <div class="phone" id="phone">
+        <div class="p-top"><b>Flat 4B</b><span class="avs"><span class="av">Y</span><span class="av m">R</span><span class="av c">K</span><span class="av v">M</span></span></div>
+        <div class="bal"><small>You are owed</small><b>₹1,840</b><span>2 people owe you</span></div>
+        <ul class="rows">
+          <li><i style="background:var(--mint)"></i><span>Groceries<small>Riya paid</small></span><b>₹2,400</b></li>
+          <li><i style="background:var(--sun)"></i><span>Wifi bill<small>You paid</small></span><b>₹999</b></li>
+          <li><i style="background:var(--coral)"></i><span>Friday dinner<small>Kabir paid</small></span><b>₹3,200</b></li>
+          <li><i style="background:var(--violet)"></i><span>Electricity<small>You paid</small></span><b>₹1,760</b></li>
+        </ul>
+        <div class="tabs"><b>Groups</b><span>Activity</span><span>Settle</span><span>You</span></div>
+      </div>
+      <div class="float sticker f1" data-z="1.6">Riya paid ₹2,400 for groceries</div>
+      <div class="float sticker f2" data-z="2.2">All settled up</div>
+      <div class="coin c1" data-z="2.8">₹</div><div class="coin c2" data-z="1.2">₹</div>
+    </div>
+  </div>
+</div>
+
+<section id="split"><div class="wrap">
+  <p class="kick">Try it right here</p>
+  <h2>Who owes whom?</h2>
+  <p class="lede">Add the people and what each of them paid for. Chillar splits everything equally and tells you the fewest payments that settle the group.</p>
+  <div class="split">
+    <div class="box sticker">
+      <h3>People</h3>
+      <div class="people" id="people"></div>
+      <form class="inline" id="pf"><input id="pn" placeholder="Add a name" maxlength="14" aria-label="Name to add"><button class="btn sm" type="submit">Add person</button></form>
+      <h3>Expenses</h3>
+      <ul class="exp" id="exp"></ul>
+      <form class="addrow" id="ef">
+        <input id="ew" placeholder="What for?" maxlength="20" aria-label="What the expense was for">
+        <input id="ea" type="number" min="1" step="1" placeholder="₹ Amount" aria-label="Amount in rupees">
+        <select id="ep" aria-label="Who paid"></select>
+        <button class="btn sm y" type="submit">Add</button>
+      </form>
+      <p class="err" id="err" aria-live="polite"></p>
+    </div>
+    <div class="box sticker out">
+      <h3>Settle up</h3>
+      <div class="tot"><span>Total spent<b id="tTot"></b></span><span>Each person's share<b id="tEach"></b></span></div>
+      <ul class="pay" id="pay" aria-live="polite"></ul>
+    </div>
+  </div>
+</div></section>
+
+<section id="simplify" style="padding-top:0"><div class="wrap simp">
+  <div>
+    <p class="kick">How it works</p>
+    <h2>Fewer payments, same result</h2>
+    <p class="lede">In a group, everyone ends up owing everyone a little. Chillar nets it all out so each person pays or receives just once where it can.</p>
+    <p class="count" id="cnt">6 payments</p>
+    <button class="btn y" type="button" id="simpBtn">Simplify the debts</button>
+  </div>
+  <div class="graph sticker" id="graph" data-s="0">
+    <svg viewBox="0 0 420 340" role="img" aria-label="Four people with six debts between them, which simplify into three payments.">
+      <defs>
+        <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#17132b"/></marker>
+        <marker id="ahv" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#6747ff"/></marker>
+      </defs>
+      <g class="old">
+        <path class="e" d="M112 70 L300 70"/><path class="e" d="M330 100 L330 240"/><path class="e" d="M300 275 L120 275"/><path class="e" d="M85 245 L85 105"/>
+        <path class="e" d="M112 92 L302 250"/><path class="e" d="M116 252 L304 96"/>
+        <text class="amt" x="190" y="60">₹300</text><text class="amt" x="340" y="175">₹300</text><text class="amt" x="190" y="298">₹200</text><text class="amt" x="34" y="180">₹500</text><text class="amt" x="238" y="212">₹100</text><text class="amt" x="238" y="140">₹100</text>
+      </g>
+      <g class="nw">
+        <path class="e new" d="M85 245 L85 105"/><path class="e new" d="M116 252 L304 96"/><path class="e new" d="M120 275 L300 275"/>
+        <text class="amt" x="34" y="180">₹100</text><text class="amt" x="218" y="150">₹100</text><text class="amt" x="190" y="298">₹200</text>
+      </g>
+      <g><circle cx="85" cy="70" r="30" fill="#ffd84d" stroke="#17132b" stroke-width="2.5"/><text x="85" y="76" text-anchor="middle">Asha</text>
+      <circle cx="330" cy="70" r="30" fill="#2fd39a" stroke="#17132b" stroke-width="2.5"/><text x="330" y="76" text-anchor="middle">Bala</text>
+      <circle cx="330" cy="275" r="30" fill="#ff6b6b" stroke="#17132b" stroke-width="2.5"/><text x="330" y="281" text-anchor="middle">Chitra</text>
+      <circle cx="85" cy="275" r="30" fill="#fff" stroke="#17132b" stroke-width="2.5"/><text x="85" y="281" text-anchor="middle">Dev</text></g>
+    </svg>
+  </div>
+</div></section>
+
+<section id="features" style="padding-top:0"><div class="wrap">
+  <p class="kick">Features</p>
+  <h2>Money talk, minus the awkward</h2>
+  <div class="feats">
+    <div class="feat sticker"><div class="nudge">Hey Kabir, a small nudge: ₹640 for the wifi is still open. Pay whenever you can.</div><h3>Polite nudges</h3><p>Chillar sends the reminder so you don't have to be that person.</p></div>
+    <div class="feat sticker"><div class="cal" id="cal"></div><h3>Rent on repeat</h3><p>Set up rent, wifi and the cook's salary once. They add themselves every month.</p></div>
+    <div class="feat sticker"><button class="btn sm tap" type="button" id="tap">Mark as paid</button><h3>Settle in one tap</h3><p>Pay with any UPI app, tap once, and the balance clears for everyone.</p></div>
+  </div>
+</div></section>
+
+<section class="final" id="get"><div class="wrap"><div class="in">
+  <h2>Keep the friends. Lose the maths.</h2>
+  <div class="cta"><a class="btn y" href="#split">Try the splitter</a><a class="btn" href="#top">Back to top</a></div>
+</div></div></section>
+</main>
+<footer><div class="wrap"><span>Concept project. Chillar is not a real app.</span><span>Designed and built by Abhiram Appani</span></div></footer>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => s.replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const inr = n => "₹" + Math.round(n).toLocaleString("en-IN");
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* ---------- 3D phone with spring parallax ---------- */
+(function(){
+  if (reduce || !matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+  const hero = $("#hero"), phone = $("#phone"), fl = [...document.querySelectorAll("[data-z]")];
+  let x = 0, y = 0, vx = 0, vy = 0, gx = 0, gy = 0;
+  hero.addEventListener("pointermove", e => { const r = hero.getBoundingClientRect(); gx = (e.clientX - r.left) / r.width - .5; gy = (e.clientY - r.top) / r.height - .5; });
+  hero.addEventListener("pointerleave", () => gx = gy = 0);
+  (function step(){
+    vx = (vx + (gx - x) * .07) * .84; x += vx; vy = (vy + (gy - y) * .07) * .84; y += vy;
+    phone.style.transform = `rotateY(${(-16 + x * 22).toFixed(2)}deg) rotateX(${(7 - y * 16).toFixed(2)}deg) rotateZ(3deg)`;
+    fl.forEach(f => f.style.transform = `translate(${(x * -26 * f.dataset.z).toFixed(1)}px,${(y * -22 * f.dataset.z).toFixed(1)}px)`);
+    requestAnimationFrame(step);
+  })();
+})();
+
+/* ---------- the splitter ---------- */
+(function(){
+  let people = ["You","Riya","Kabir","Meera"];
+  let exps = [{w:"Groceries",a:2400,p:"Riya"},{w:"Wifi bill",a:999,p:"You"},{w:"Friday dinner",a:3200,p:"Kabir"}];
+  const err = $("#err");
+  function settle(){
+    const total = exps.reduce((s,e) => s + e.a, 0), share = people.length ? total / people.length : 0;
+    const bal = people.map(n => ({n, v: exps.filter(e => e.p === n).reduce((s,e) => s + e.a, 0) - share}));
+    const owe = bal.filter(b => b.v < -.5).map(b => ({n:b.n, v:-b.v})).sort((a,b) => b.v - a.v);
+    const get = bal.filter(b => b.v > .5).sort((a,b) => b.v - a.v);
+    const pays = [];
+    while (owe.length && get.length){
+      const d = owe[0], c = get[0], m = Math.min(d.v, c.v);
+      pays.push([d.n, c.n, m]); d.v -= m; c.v -= m;
+      if (d.v < .5) owe.shift(); if (c.v < .5) get.shift();
+    }
+    return {total, share, pays};
+  }
+  function paint(){
+    $("#people").innerHTML = people.map((n,i) => `<span class="chip">${esc(n)}<button type="button" data-i="${i}" aria-label="Remove ${esc(n)}">&times;</button></span>`).join("");
+    $("#ep").innerHTML = people.map(n => `<option>${esc(n)}</option>`).join("");
+    $("#exp").innerHTML = exps.length ? exps.map((e,i) => `<li><span>${esc(e.w)}<small>${esc(e.p)} paid</small></span><b>${inr(e.a)}</b><button type="button" data-i="${i}">Remove</button></li>`).join("") : `<li><span>No expenses yet. Add one below.</span></li>`;
+    const r = settle();
+    $("#tTot").textContent = inr(r.total); $("#tEach").textContent = inr(r.share);
+    const arrow = `<svg viewBox="0 0 22 12" aria-hidden="true"><path d="M1 6h19M15 1l5 5-5 5"/></svg>`;
+    $("#pay").innerHTML = r.pays.length ? r.pays.map((p,i) => `<li style="animation-delay:${i*60}ms">${esc(p[0])} ${arrow} ${esc(p[1])}<b>${inr(p[2])}</b></li>`).join("")
+      : `<li class="none">${exps.length ? "Everyone is settled up." : "Add an expense to see who owes whom."}</li>`;
+  }
+  $("#people").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return;
+    if (people.length <= 2){ err.textContent = "A group needs at least two people."; return; }
+    const n = people[+b.dataset.i]; people.splice(+b.dataset.i, 1); exps = exps.filter(x => x.p !== n); err.textContent = ""; paint(); });
+  $("#pf").addEventListener("submit", e => { e.preventDefault(); const v = $("#pn").value.trim();
+    if (!v){ err.textContent = "Type a name first."; return; }
+    if (people.some(p => p.toLowerCase() === v.toLowerCase())){ err.textContent = v + " is already in the group."; return; }
+    if (people.length >= 8){ err.textContent = "This demo holds up to eight people."; return; }
+    people.push(v); $("#pn").value = ""; err.textContent = ""; paint(); });
+  $("#exp").addEventListener("click", e => { const b = e.target.closest("button"); if (b){ exps.splice(+b.dataset.i, 1); paint(); } });
+  $("#ef").addEventListener("submit", e => { e.preventDefault(); const w = $("#ew").value.trim(), a = Math.round(+$("#ea").value), p = $("#ep").value;
+    if (!w){ err.textContent = "Say what the expense was for."; return; }
+    if (!(a > 0)){ err.textContent = "Enter an amount above zero."; return; }
+    exps.push({w, a, p}); $("#ew").value = ""; $("#ea").value = ""; err.textContent = ""; paint(); $("#ep").value = p; });
+  paint();
+})();
+
+/* ---------- small interactions ---------- */
+$("#simpBtn").addEventListener("click", e => { const g = $("#graph"), on = g.dataset.s === "0"; g.dataset.s = on ? "1" : "0";
+  $("#cnt").textContent = on ? "3 payments" : "6 payments"; e.currentTarget.textContent = on ? "Show the original debts" : "Simplify the debts"; });
+$("#cal").innerHTML = Array.from({length:28}, (_,i) => `<i class="${i === 0 || i === 4 ? "on" : ""}"></i>`).join("");
+$("#tap").addEventListener("click", e => { e.currentTarget.textContent = "Paid. Balance cleared."; e.currentTarget.classList.add("v"); });
+</script>
+</body>
+</html>

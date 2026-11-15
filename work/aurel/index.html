@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aurel One</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@300;400;500&family=Marcellus&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: a jeweller's case. One object under studio light, held in the centre of a dark room
+   while the page turns it over for you. Type is quiet; the metal does the talking. */
+:root{
+  --room:#0a0908;
+  --ivory:#efe9df;
+  --mute:#9b9389;
+  --gold:#d8b57a;
+  --line:rgba(239,233,223,.13);
+  --display:"Marcellus","Cormorant Garamond",Georgia,serif;
+  --body:"Hanken Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --ease:cubic-bezier(.23,1,.32,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--room);color:var(--ivory);font:300 17px/1.65 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(60% 55% at 50% 45%,rgba(216,181,122,.11),transparent 70%),radial-gradient(90% 70% at 50% 120%,rgba(216,181,122,.08),transparent 70%)}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.fallback{display:none;position:fixed;left:50%;top:44%;width:min(46vw,300px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;z-index:1;pointer-events:none;
+  background:conic-gradient(from 210deg,#6b532c,#f6e2b6,#8a6b3a,#fff3d6,#6b532c);-webkit-mask:radial-gradient(closest-side,transparent 80%,#000 81%);mask:radial-gradient(closest-side,transparent 80%,#000 81%)}
+.nogl .fallback{display:block}
+main,header,footer{position:relative;z-index:2}
+a{color:inherit}
+:focus-visible{outline:1px solid var(--gold);outline-offset:4px}
+h1,h2{font-family:var(--display);font-weight:400;margin:0;line-height:1.04;letter-spacing:-.01em;text-wrap:balance}
+h1{font-size:clamp(2.8rem,8vw,6.6rem)}
+h2{font-size:clamp(2.1rem,5vw,3.9rem)}
+.label{font:400 .72rem/1 var(--body);letter-spacing:.34em;text-transform:uppercase;color:var(--gold);margin:0 0 22px}
+p{margin:0}
+.copy{color:var(--mute);max-width:36ch;margin-top:22px}
+
+header{position:fixed;left:0;right:0;top:0;display:flex;align-items:center;justify-content:space-between;padding:22px clamp(20px,4vw,48px);z-index:5}
+.mark{font:400 1.25rem var(--display);letter-spacing:.42em;text-decoration:none}
+.pill{font:400 .78rem var(--body);letter-spacing:.2em;text-transform:uppercase;text-decoration:none;padding:11px 20px;border:1px solid var(--line);border-radius:99px;background:rgba(10,9,8,.5);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);cursor:pointer;color:var(--ivory);
+  transition:transform .16s var(--ease),background-color .25s ease,color .25s ease,border-color .25s ease}
+.pill:active{transform:scale(.97)}
+.pill.solid{background:var(--ivory);color:var(--room);border-color:var(--ivory)}
+@media (hover:hover) and (pointer:fine){.pill:hover{background:var(--gold);border-color:var(--gold);color:var(--room)}}
+
+section{min-height:100vh;display:flex;align-items:center;padding:110px clamp(20px,6vw,90px)}
+section>.in{width:100%;max-width:1200px;margin:0 auto;display:flex}
+.left>.in{justify-content:flex-start}.right>.in{justify-content:flex-end}.mid>.in{justify-content:center;text-align:center}
+.block{max-width:440px}
+.mid .block{max-width:760px}.mid .copy{margin-inline:auto}
+
+/* hero */
+.hero{align-items:flex-end;padding-bottom:9vh}
+.hero .block{max-width:none}
+.hero h1 span{display:inline-block;animation:up 1.2s var(--ease) backwards;animation-delay:calc(var(--d) * 110ms + 300ms)}
+@keyframes up{from{opacity:0;transform:translateY(.5em);filter:blur(10px)}}
+.hero .meta{display:flex;gap:26px;justify-content:center;flex-wrap:wrap;margin-top:28px;font-size:.82rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mute);animation:up 1.2s var(--ease) 1s backwards}
+.scroll{position:absolute;left:50%;bottom:22px;width:1px;height:38px;background:linear-gradient(var(--gold),transparent);transform-origin:top;animation:drip 2.2s ease-in-out infinite}
+@keyframes drip{0%{transform:scaleY(0)}50%{transform:scaleY(1)}100%{transform:scaleY(1);opacity:0}}
+
+/* reveal */
+.rv>*{opacity:.25;transform:translateY(22px);transition:opacity .9s var(--ease),transform .9s var(--ease);transition-delay:calc(var(--i,0) * 90ms)}
+.rv.on>*{opacity:1;transform:none}
+
+.stats{display:grid;grid-template-columns:repeat(3,auto);gap:30px;margin-top:40px;padding-top:26px;border-top:1px solid var(--line);justify-content:start}
+.stats b{display:block;font:400 2.3rem/1 var(--display);font-variant-numeric:tabular-nums}
+.stats span{font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+.sensors{list-style:none;margin:34px 0 0;padding:0;border-top:1px solid var(--line)}
+.sensors li{display:flex;gap:16px;align-items:baseline;padding:15px 0;border-bottom:1px solid var(--line)}
+.sensors i{flex:none;width:7px;height:7px;border-radius:50%;background:var(--c);box-shadow:0 0 12px var(--c);transform:translateY(-2px)}
+.sensors b{font-weight:400;min-width:9.5em}
+.sensors span{color:var(--mute);font-size:.92rem}
+
+/* finishes */
+.finish{align-items:flex-end;padding-bottom:10vh}
+.swatches{display:flex;gap:16px;justify-content:center;margin-top:34px}
+.swatches button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--c);cursor:pointer;position:relative;transition:transform .2s var(--ease)}
+.swatches button::after{content:"";position:absolute;inset:-7px;border-radius:50%;border:1px solid var(--ivory);opacity:0;transform:scale(.9);transition:opacity .25s ease,transform .3s var(--ease)}
+.swatches button[aria-pressed="true"]::after{opacity:1;transform:none}
+.swatches button:active{transform:scale(.94)}
+#finishName{font:400 1.5rem var(--display);margin-top:26px;min-height:1.4em;transition:opacity .2s ease,filter .2s ease}
+#finishName.sw{opacity:0;filter:blur(4px)}
+
+/* sleep card */
+.app{width:min(100%,380px);border:1px solid var(--line);border-radius:26px;padding:26px;background:rgba(18,16,14,.72);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 30px 80px rgba(0,0,0,.5);margin-top:34px}
+.app .row{display:flex;align-items:center;gap:20px}
+.gauge{position:relative;width:112px;height:112px;flex:none}
+.gauge svg{width:100%;height:100%;transform:rotate(-90deg)}
+.gauge circle{fill:none;stroke-width:7}
+.gauge .bg{stroke:var(--line)}
+.gauge .fg{stroke:var(--gold);stroke-linecap:round;stroke-dasharray:314;stroke-dashoffset:314;transition:stroke-dashoffset 1.8s var(--ease) .3s}
+.on .gauge .fg{stroke-dashoffset:44}
+.gauge b{position:absolute;inset:0;display:grid;place-items:center;font:400 2.2rem var(--display);font-variant-numeric:tabular-nums}
+.app h3{font:400 1.25rem var(--display);margin:0 0 4px}
+.app small{color:var(--mute);font-size:.86rem}
+.spark{margin-top:22px;width:100%;height:64px;overflow:visible}
+.spark path{fill:none;stroke:var(--ivory);stroke-width:1.5;stroke-dasharray:700;stroke-dashoffset:700;transition:stroke-dashoffset 2.2s var(--ease) .5s}
+.on .spark path{stroke-dashoffset:0}
+.stages{display:flex;gap:4px;margin-top:16px;height:8px}
+.stages i{flex:var(--f);border-radius:8px;background:var(--c);transform-origin:left;transform:scaleX(0);transition:transform .9s var(--ease);transition-delay:calc(var(--k) * 140ms + 700ms)}
+.on .stages i{transform:none}
+.keys{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:.74rem;letter-spacing:.1em;text-transform:uppercase;color:var(--mute)}
+.keys span::before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--c);margin-right:7px}
+
+/* order */
+.order{align-items:flex-end;padding-bottom:8vh}
+.price{font:400 1.1rem var(--body);color:var(--mute);margin-top:18px}
+.price b{font:400 2.4rem var(--display);color:var(--ivory);margin-right:8px}
+.sizes{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:30px 0 26px}
+.sizes button{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ivory);font:400 .95rem var(--body);cursor:pointer;transition:background-color .2s ease,color .2s ease,border-color .2s ease,transform .16s var(--ease)}
+.sizes button:active{transform:scale(.94)}
+.sizes button[aria-pressed="true"]{background:var(--ivory);color:var(--room);border-color:var(--ivory)}
+#orderNote{margin-top:18px;font-size:.9rem;color:var(--gold);min-height:1.6em}
+footer{padding:26px clamp(20px,4vw,48px);border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:.78rem;letter-spacing:.08em;color:var(--mute);background:var(--room)}
+
+@media (max-width:820px){
+  section{align-items:flex-end;padding:54vh 22px 60px}
+  section>.in{justify-content:center!important}
+  .hero,.finish,.order{padding-top:54vh}
+  .stats{gap:18px}.stats b{font-size:1.8rem}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv>*{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<div class="fallback" aria-hidden="true"></div>
+
+<header>
+  <a class="mark" href="#top">AUREL</a>
+  <a class="pill" href="#order">Reserve</a>
+</header>
+
+<main id="top">
+  <section class="mid hero" data-k="0">
+    <div class="in"><div class="block">
+      <p class="label" style="animation:up 1.2s var(--ease) .1s backwards">Aurel One · Smart ring</p>
+      <h1><span style="--d:0">Health,</span> <span style="--d:1">worn</span> <span style="--d:2">quietly.</span></h1>
+      <div class="meta"><span>Titanium</span><span>7-day battery</span><span>No screen</span></div>
+    </div></div>
+    <span class="scroll" aria-hidden="true"></span>
+  </section>
+
+  <section class="left" data-k="1">
+    <div class="in"><div class="block rv">
+      <p class="label">The band</p>
+      <h2 style="--i:1">2.4 grams of titanium.</h2>
+      <p class="copy" style="--i:2">Lighter than a wedding band and thinner than a coin. You stop noticing it by lunchtime, which is the point.</p>
+      <div class="stats" style="--i:3">
+        <div><b data-n="2.4" data-f="1">0</b><span>grams</span></div>
+        <div><b data-n="7">0</b><span>days of battery</span></div>
+        <div><b data-n="100">0</b><span>metres deep</span></div>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="right" data-k="2">
+    <div class="in"><div class="block rv">
+      <p class="label">Inside</p>
+      <h2 style="--i:1">Three sensors against your skin.</h2>
+      <ul class="sensors" style="--i:2">
+        <li style="--c:#7cf0a4"><i></i><b>Heart rate</b><span>Green light, read every five minutes</span></li>
+        <li style="--c:#ff6b5a"><i></i><b>Blood oxygen</b><span>Red and infrared, read overnight</span></li>
+        <li style="--c:#f4d9a0"><i></i><b>Skin temperature</b><span>Tracks your baseline, flags a change</span></li>
+      </ul>
+    </div></div>
+  </section>
+
+  <section class="mid finish" data-k="3">
+    <div class="in"><div class="block rv">
+      <p class="label">Finishes</p>
+      <h2 style="--i:1">Four ways to wear it.</h2>
+      <div class="swatches" id="swatches" style="--i:2" role="group" aria-label="Choose a finish">
+        <button type="button" style="--c:#d8b57a" data-f="0" aria-pressed="true" aria-label="Champagne gold"></button>
+        <button type="button" style="--c:#b9bcc2" data-f="1" aria-pressed="false" aria-label="Brushed titanium"></button>
+        <button type="button" style="--c:#26272c" data-f="2" aria-pressed="false" aria-label="Midnight"></button>
+        <button type="button" style="--c:#d9a08e" data-f="3" aria-pressed="false" aria-label="Rose"></button>
+      </div>
+      <p id="finishName" style="--i:3">Champagne gold</p>
+    </div></div>
+  </section>
+
+  <section class="left" data-k="4">
+    <div class="in"><div class="block rv" id="sleep">
+      <p class="label">Every morning</p>
+      <h2 style="--i:1">One number, and the reason for it.</h2>
+      <div class="app" style="--i:2">
+        <div class="row">
+          <div class="gauge"><svg viewBox="0 0 112 112"><circle class="bg" cx="56" cy="56" r="50"/><circle class="fg" cx="56" cy="56" r="50"/></svg><b data-n="86">0</b></div>
+          <div><h3>Well rested</h3><small>7 h 42 m asleep. Resting heart rate 52.</small></div>
+        </div>
+        <svg class="spark" viewBox="0 0 320 64" preserveAspectRatio="none" aria-hidden="true"><path d="M0 20 C20 22 30 40 50 42 S80 30 100 44 S130 56 150 50 S180 34 200 46 S230 58 250 48 S290 26 320 18"/></svg>
+        <div class="stages" aria-hidden="true"><i style="--f:14;--c:#efe9df;--k:0"></i><i style="--f:48;--c:#d8b57a;--k:1"></i><i style="--f:22;--c:#8a6b3a;--k:2"></i><i style="--f:16;--c:#4a3a22;--k:3"></i></div>
+        <div class="keys"><span style="--c:#efe9df">Awake</span><span style="--c:#d8b57a">Light</span><span style="--c:#8a6b3a">Deep</span><span style="--c:#4a3a22">REM</span></div>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="mid order" id="order" data-k="5">
+    <div class="in"><div class="block rv">
+      <p class="label">Reserve yours</p>
+      <h2 style="--i:1">Aurel One</h2>
+      <p class="price" style="--i:2"><b>$349</b>ships with a sizing kit</p>
+      <div class="sizes" id="sizes" style="--i:3" role="group" aria-label="Ring size"></div>
+      <button class="pill solid" id="reserve" type="button" style="--i:4">Reserve in <span id="resFinish">champagne gold</span></button>
+      <p id="orderNote" aria-live="polite"></p>
+    </div></div>
+  </section>
+</main>
+
+<footer><span>Aurel is a concept site. The product is fictional and nothing can be ordered.</span><span>Designed and built by Abhiram Appani</span></footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const FINISH = [
+  {n:"Champagne gold",   c:0xd8b57a, r:.2},
+  {n:"Brushed titanium", c:0xc2c5cb, r:.34},
+  {n:"Midnight",         c:0x1f2025, r:.3},
+  {n:"Rose",             c:0xdba290, r:.2}
+];
+let setFinish = () => {};
+
+/* ---------- the ring ---------- */
+(function(){
+  if (!window.THREE){ document.body.classList.add("nogl"); return; }
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({canvas:$("#gl"), antialias:true, alpha:true}); }
+  catch (e){ document.body.classList.add("nogl"); return; }
+  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 2));
+  renderer.outputEncoding = THREE.sRGBEncoding; renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.25;
+  const scene = new THREE.Scene(), cam = new THREE.PerspectiveCamera(32, 1, .1, 50); cam.position.z = 7;
+
+  /* a studio drawn on a canvas: soft boxes that the metal reflects */
+  const ec = document.createElement("canvas"); ec.width = 1024; ec.height = 512; const x = ec.getContext("2d");
+  x.fillStyle = "#2b241b"; x.fillRect(0,0,1024,512);
+  const box = (cx, cy, rx, ry, col) => { const g = x.createRadialGradient(cx, cy, 0, cx, cy, rx); g.addColorStop(0, col); g.addColorStop(1, "rgba(0,0,0,0)"); x.save(); x.translate(cx, cy); x.scale(1, ry / rx); x.translate(-cx, -cy); x.fillStyle = g; x.fillRect(cx - rx, cy - rx, rx*2, rx*2); x.restore(); };
+  box(512, 40, 420, 150, "rgba(255,250,240,1)"); box(120, 250, 150, 260, "rgba(255,236,205,.95)"); box(900, 230, 120, 240, "rgba(210,225,255,.8)");
+  box(512, 500, 500, 90, "rgba(216,181,122,.5)"); box(330, 300, 40, 150, "rgba(255,255,255,.9)"); box(700, 330, 30, 120, "rgba(255,255,255,.7)");
+  const eq = new THREE.CanvasTexture(ec); eq.mapping = THREE.EquirectangularReflectionMapping; eq.encoding = THREE.sRGBEncoding;
+  const pm = new THREE.PMREMGenerator(renderer); scene.environment = pm.fromEquirectangular(eq).texture; pm.dispose();
+
+  /* band cross-section: a rounded rectangle swept around the finger */
+  const pts = [], cxr = .95, hw = .055, hh = .24, cr = .055;
+  const corner = (ox, oy, a0) => { for (let i = 0; i <= 8; i++){ const a = a0 + i / 8 * Math.PI / 2; pts.push(new THREE.Vector2(ox + Math.cos(a) * cr, oy + Math.sin(a) * cr)); } };
+  corner(cxr + hw - cr,  hh - cr, 0); corner(cxr - hw + cr,  hh - cr, Math.PI / 2);
+  corner(cxr - hw + cr, -hh + cr, Math.PI); corner(cxr + hw - cr, -hh + cr, Math.PI * 1.5); pts.push(pts[0].clone());
+  const metal = new THREE.MeshStandardMaterial({color:FINISH[0].c, metalness:1, roughness:FINISH[0].r, envMapIntensity:1.5});
+  const ring = new THREE.Group(), band = new THREE.Mesh(new THREE.LatheGeometry(pts, 160), metal); ring.add(band);
+  const glass = new THREE.MeshStandardMaterial({color:0x0a0a0c, metalness:.4, roughness:.08, envMapIntensity:2});
+  const leds = [];
+  [[-.34,0x7cf0a4],[0,0xff6b5a],[.34,0xf4d9a0]].forEach(([a,col]) => {
+    const r = cxr - hw + .004, px = Math.sin(a) * r, pz = Math.cos(a) * r;
+    const dome = new THREE.Mesh(new THREE.SphereGeometry(.075, 24, 16), glass); dome.position.set(px, 0, pz); dome.scale.set(1, 1.6, .45); dome.lookAt(0,0,0); ring.add(dome);
+    const led = new THREE.Mesh(new THREE.SphereGeometry(.022, 12, 12), new THREE.MeshBasicMaterial({color:col})); led.position.set(Math.sin(a) * (r - .028), 0, Math.cos(a) * (r - .028)); ring.add(led); leds.push(led);
+  });
+  scene.add(ring);
+  const key = new THREE.DirectionalLight(0xfff1dc, .6); key.position.set(2, 4, 5); scene.add(key);
+
+  /* where the ring sits for each section: x, y, scale, rotX, rotY, rotZ */
+  const K = [
+    [0, .72, 1.0, 1.05, .35, 0],
+    [1.75, 0, 1.0, .35, -.75, .25],
+    [-1.75, .05, 1.25, 1.35, 1.05, -.2],
+    [0, .75, 1.05, .8, 0, 0],
+    [1.85, 0, .85, .15, .9, .5],
+    [0, 1.05, .8, 1.5, 0, 0]
+  ];
+  const secs = [...document.querySelectorAll("section[data-k]")];
+  const cur = K[0].slice(), col = new THREE.Color(FINISH[0].c), goalCol = new THREE.Color(FINISH[0].c);
+  let goalRough = FINISH[0].r, spin = 0, spinV = 0, mx = 0, my = 0, gmx = 0, gmy = 0, narrow = false, W = 0, H = 0;
+  setFinish = i => { goalCol.setHex(FINISH[i].c); goalRough = FINISH[i].r; spinV += .22; };
+  function resize(){
+    W = innerWidth; H = innerHeight; renderer.setSize(W, H, false); cam.aspect = W / H; cam.updateProjectionMatrix(); narrow = W < 820;
+  }
+  function target(){
+    const mid = H * .5; let f = 0;
+    for (let i = 0; i < secs.length; i++){ const r = secs[i].getBoundingClientRect(); if (r.top + r.height / 2 <= mid) f = i; }
+    const a = secs[f].getBoundingClientRect(), n = Math.min(f + 1, secs.length - 1), b = secs[n].getBoundingClientRect();
+    const ca = a.top + a.height / 2, cb = b.top + b.height / 2;
+    let t = n === f ? 0 : Math.max(0, Math.min(1, (mid - ca) / (cb - ca))); t = t * t * (3 - 2 * t);
+    return K[f].map((v,i) => v + (K[n][i] - v) * t);
+  }
+  function frame(ms){
+    const g = target(), t = ms / 1000;
+    if (narrow){ g[0] = 0; g[1] = 1.15; g[2] *= .6; }
+    for (let i = 0; i < 6; i++) cur[i] += (g[i] - cur[i]) * (reduce ? 1 : .07);
+    mx += (gmx - mx) * .05; my += (gmy - my) * .05; spinV *= .95; spin += spinV;
+    ring.position.set(cur[0], cur[1], 0); ring.scale.setScalar(cur[2]);
+    ring.rotation.set(cur[3] + Math.sin(t * .55) * .07 + my * .25, cur[4] + (reduce ? 0 : t * .12) + mx * .35 + spin, cur[5] + Math.cos(t * .4) * .05);
+    col.lerp(goalCol, .06); metal.color.copy(col); metal.roughness += (goalRough - metal.roughness) * .06;
+    leds.forEach((l,i) => l.scale.setScalar(.8 + .5 * Math.max(0, Math.sin(t * 2.2 + i * 1.7))));
+    renderer.render(scene, cam);
+    if (!reduce) requestAnimationFrame(frame);
+  }
+  addEventListener("resize", () => { resize(); if (reduce) frame(0); });
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches) addEventListener("pointermove", e => { gmx = e.clientX / innerWidth - .5; gmy = e.clientY / innerHeight - .5; });
+  if (reduce) addEventListener("scroll", () => requestAnimationFrame(frame), {passive:true});
+  resize(); requestAnimationFrame(frame);
+})();
+
+/* ---------- reveals and counters ---------- */
+function count(b){
+  const n = +b.dataset.n, f = +(b.dataset.f || 0); if (reduce){ b.textContent = n.toFixed(f); return; }
+  const t0 = performance.now();
+  (function go(now){ const p = Math.min((now - t0) / 1500, 1), e = 1 - Math.pow(1 - p, 4); b.textContent = (n * e).toFixed(f); if (p < 1) requestAnimationFrame(go); })(t0);
+}
+if ("IntersectionObserver" in window){
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("on"); e.target.querySelectorAll("[data-n]").forEach(count); io.unobserve(e.target); } }), {threshold:.3});
+  document.querySelectorAll(".rv").forEach(el => io.observe(el));
+} else document.querySelectorAll(".rv").forEach(el => { el.classList.add("on"); el.querySelectorAll("[data-n]").forEach(count); });
+
+/* ---------- finishes ---------- */
+$("#swatches").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return; const i = +b.dataset.f, name = $("#finishName");
+  $("#swatches").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b));
+  setFinish(i); name.classList.add("sw");
+  setTimeout(() => { name.textContent = FINISH[i].n; name.classList.remove("sw"); }, 180);
+  $("#resFinish").textContent = FINISH[i].n.toLowerCase();
+});
+
+/* ---------- order ---------- */
+const sizes = $("#sizes"); let size = 9;
+sizes.innerHTML = [6,7,8,9,10,11,12,13].map(s => `<button type="button" aria-pressed="${s === size}">${s}</button>`).join("");
+sizes.addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; size = +b.textContent; sizes.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); });
+$("#reserve").addEventListener("click", () => { $("#orderNote").textContent = `Size ${size} in ${$("#resFinish").textContent}. This is a concept site, so nothing was ordered.`; });
+</script>
+</body>
+</html>
