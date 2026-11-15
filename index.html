@@ -86,7 +86,7 @@ section::before{content:"";position:absolute;top:0;left:50%;width:min(1072px,cal
 }
 
 /* hero: a planet horizon with an aurora rising behind it */
-.hero{position:relative;margin-top:-58px;padding-top:176px;overflow:hidden;text-align:center;
+.hero{position:relative;margin-top:-58px;padding-top:clamp(112px,15vh,176px);min-height:max(100svh,660px);display:flex;flex-direction:column;overflow:hidden;text-align:center;
   background:radial-gradient(70% 55% at 50% 100%,rgba(108,199,255,.10),transparent 70%)}
 #aurora{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;animation:fade 1.6s ease .2s backwards}
 .hero .wrap{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center}
@@ -101,12 +101,12 @@ h1 .w{display:inline-block;animation:blur-in .9s var(--ease-out) backwards;anima
 .rot{display:block;font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em;font-size:1.1em;line-height:1.1;white-space:nowrap;height:1.15em;color:#fff;
   animation:blur-in .9s var(--ease-out) .5s backwards}
 .rot span{display:inline-block;will-change:transform,opacity;background:linear-gradient(180deg,#fff 20%,var(--fe) 140%);-webkit-background-clip:text;background-clip:text;color:transparent;padding:0 .02em .12em}
-.hero p.intro{max-width:50ch;font-size:1.12rem;line-height:1.6;color:var(--soft);margin:28px auto 34px}
+.hero p.intro{max-width:58ch;font-size:1.12rem;line-height:1.6;color:var(--soft);margin:28px auto 34px}
 .cta{display:flex;gap:10px;flex-wrap:wrap}
 .hero .cta{justify-content:center}
 .hero [data-in]{animation:rise .8s var(--ease-out) backwards;animation-delay:calc(var(--d) * 70ms + 80ms)}
 @keyframes rise{from{opacity:0;transform:translateY(12px);filter:blur(6px)}}
-.horizon{position:relative;z-index:1;height:clamp(230px,30vw,380px);margin-top:28px;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;
+.horizon{position:relative;z-index:1;flex:1 0 auto;min-height:clamp(230px,34vh,400px);margin-top:28px;cursor:grab;touch-action:pan-y;user-select:none;-webkit-user-select:none;
   -webkit-mask-image:linear-gradient(to bottom,#000 45%,transparent 98%);mask-image:linear-gradient(to bottom,#000 45%,transparent 98%);
   animation:planet-in 1.4s var(--ease-out) .3s backwards}
 @keyframes planet-in{from{opacity:0;transform:translateY(40px)}}
@@ -326,7 +326,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   .gallery{grid-template-columns:1fr;grid-auto-rows:auto}
   .gallery .ph{grid-column:auto;grid-row:auto;aspect-ratio:4/3}
   .svc{padding:26px}.svc::before{left:26px;right:26px}
-  .hero{padding-top:150px}
+  .hero{padding-top:128px}
   .nav .links{display:none}
   .tag3d{font-size:11.5px;padding:5px 9px 5px 8px}
 }
@@ -582,6 +582,13 @@ const SKILLS = [
   ["HTML","fe"],["Queues","be"],["CSS","fe"],["Pub/Sub","be"],
   ["Async JS","be"],["AI automations","be"],["OpenAI API","be"]
 ];
+/* Pins on the hero globe: the kinds of things I build, coloured by layer. */
+const GLOBE = [
+  ["Landing pages","fe"],["AI chatbots","tl"],["REST APIs","be"],["Dashboards","fe"],["Workflow automation","tl"],["Databases","db"],
+  ["Online stores","fe"],["Booking systems","be"],["Lead follow-ups","tl"],["Admin panels","be"],["Analytics","db"],["Portfolio sites","fe"],
+  ["Payments","be"],["Email automation","tl"],["Sign-in and accounts","be"],["3D and motion","fe"],["AI integrations","tl"],["Realtime chat","be"],
+  ["SEO and speed","fe"],["Internal tools","be"],["Data pipelines","db"],["Deployments","tl"]
+];
 /* Photos: add entries like {src:"photos/sunset.jpg", alt:"Sunset over the lake", caption:"Golden hour", place:"Hyderabad"}.
    While this list is empty the section shows placeholder frames. */
 const PHOTOS = [];
@@ -593,20 +600,20 @@ const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
 const css = k => getComputedStyle(document.documentElement).getPropertyValue(k).trim();
 
-/* ---------- hero planet: tools ride the surface, drag to spin ---------- */
+/* ---------- hero planet: the things I build ride the surface, drag to spin ---------- */
 const planet = {cx:0, cy:0, R:0};   /* in hero coordinates, shared with the aurora shader */
 (function(){
   const box = $("#globe"), hero = $("#hero"), cv = $("#gcv"), ctx = cv.getContext("2d"), lab = $("#glabels");
-  const N = SKILLS.length, COL = {fe:css("--fe"), be:css("--be"), db:css("--db"), tl:css("--tl")}, TILT = .42, PAD = 54;
+  const N = GLOBE.length, COL = {fe:css("--fe"), be:css("--be"), db:css("--db"), tl:css("--tl")}, TILT = .2, PAD = 54;
   let drag = false, hover = false, visible = true, activeId = null, W = 0, H = 0, R = 0, dpr = 1;
   let ry = .4, vy = reduce ? 0 : .0016, lastX = 0, lean = 0, leanV = 0, leanGoal = 0;
-  const pts = SKILLS.map(([n,l],i) => {
-    const phi = (15 + (i + .5) / N * 36) * Math.PI / 180, lam = i * Math.PI * (3 - Math.sqrt(5));
+  const pts = GLOBE.map(([n,l],i) => {
+    const lam = i * Math.PI * (3 - Math.sqrt(5));
     const el = document.createElement("span");
     el.className = "tag3d"; el.dataset.l = l; el.textContent = n; lab.appendChild(el);
     el.addEventListener("pointerenter", () => hover = true);
     el.addEventListener("pointerleave", () => hover = false);
-    return {x:Math.sin(phi)*Math.cos(lam), y:-Math.cos(phi), z:Math.sin(phi)*Math.sin(lam), l, el};
+    return {f:(i + .5) / N, lam, x:0, y:-1, z:0, l, el};
   });
   const ct = Math.cos(TILT), st = Math.sin(TILT);
   function rot(x, y, z){
@@ -615,7 +622,10 @@ const planet = {cx:0, cy:0, R:0};   /* in hero coordinates, shared with the auro
   }
   function resize(){
     W = box.clientWidth; H = box.clientHeight; dpr = Math.min(window.devicePixelRatio || 1, 2);
-    R = Math.max(W * .6, 440);
+    const h = Math.max(H - PAD, 120);
+    R = Math.max(W * .6, 440, (W * W / 4 + h * h) / (2 * h) * 1.03);          /* wide enough to span the whole screen */
+    const cap = Math.acos(Math.max(-1, 1 - (h - 70) / R)), lo = .09, hi = Math.max(cap - TILT * .6, .2);
+    pts.forEach(p => { const phi = lo + Math.sqrt(p.f) * (hi - lo); p.x = Math.sin(phi)*Math.cos(p.lam); p.y = -Math.cos(phi); p.z = Math.sin(phi)*Math.sin(p.lam); });
     cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
     const hr = hero.getBoundingClientRect(), br = box.getBoundingClientRect();
     planet.cx = br.left - hr.left + W / 2; planet.cy = br.top - hr.top + PAD + R; planet.R = R;
@@ -643,7 +653,7 @@ const planet = {cx:0, cy:0, R:0};   /* in hero coordinates, shared with the auro
     g.addColorStop(0,"#121925"); g.addColorStop(.18,"#0b0f16"); g.addColorStop(1,"#07080a");
     ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.fill();
     ctx.save(); ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI*2); ctx.clip(); ctx.lineWidth = 1;
-    for (let d = 10; d <= 70; d += 10){ const p = d*Math.PI/180; line(t => [Math.sin(p)*Math.cos(t*6.2832), -Math.cos(p), Math.sin(p)*Math.sin(t*6.2832)], 90); }
+    for (let d = 6; d <= 72; d += 6){ const p = d*Math.PI/180; line(t => [Math.sin(p)*Math.cos(t*6.2832), -Math.cos(p), Math.sin(p)*Math.sin(t*6.2832)], 90); }
     for (let d = 0; d < 360; d += 15){ const l = d*Math.PI/180; line(t => { const p = t*1.25; return [Math.sin(p)*Math.cos(l), -Math.cos(p), Math.sin(p)*Math.sin(l)]; }, 28); }
     ctx.restore();
     g = ctx.createLinearGradient(cx - R*.7, 0, cx + R*.7, 0);
@@ -700,7 +710,7 @@ const planet = {cx:0, cy:0, R:0};   /* in hero coordinates, shared with the auro
   if (!gl) return;
   const VS = "attribute vec2 p;void main(){gl_Position=vec4(p,0.,1.);}";
   const FS = `precision mediump float;
-uniform vec2 c;uniform float R;uniform float t;uniform float mx;
+uniform vec2 c;uniform float R;uniform float Q;uniform float t;uniform float mx;
 vec3 perm(vec3 x){return mod(((x*34.)+1.)*x,289.);}
 float sn(vec2 v){const vec4 C=vec4(.211324865405187,.366025403784439,-.577350269189626,.024390243902439);
  vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);vec2 i1=(x0.x>x0.y)?vec2(1.,0.):vec2(0.,1.);
@@ -711,7 +721,7 @@ float sn(vec2 v){const vec4 C=vec4(.211324865405187,.366025403784439,-.577350269
  m*=1.79284291400159-.85373472095314*(a0*a0+h*h);
  vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;return 130.*dot(m,g);}
 void main(){
- vec2 q=gl_FragCoord.xy-c;float d=(length(q)-R)/R;float a=atan(q.x,q.y)+mx*.06;
+ vec2 q=gl_FragCoord.xy-c;float d=(length(q)-R)/Q;float a=atan(q.x,q.y)+mx*.06;
  float n1=sn(vec2(a*3.2+t*.05,t*.04));float n2=sn(vec2(a*8.5-t*.08,4.+t*.06));
  float h=max(.2+.11*n1+.05*n2,.05);
  float fall=exp(-max(d,0.)/h*2.4);
@@ -730,7 +740,7 @@ void main(){
   gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1,3,-1,-1,3]), gl.STATIC_DRAW);
   const loc = gl.getAttribLocation(pr, "p"); gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-  const U = {c:gl.getUniformLocation(pr,"c"), R:gl.getUniformLocation(pr,"R"), t:gl.getUniformLocation(pr,"t"), mx:gl.getUniformLocation(pr,"mx")};
+  const U = {c:gl.getUniformLocation(pr,"c"), R:gl.getUniformLocation(pr,"R"), Q:gl.getUniformLocation(pr,"Q"), t:gl.getUniformLocation(pr,"t"), mx:gl.getUniformLocation(pr,"mx")};
   const S = .5; let visible = true, mx = 0, mxGoal = 0, hh = 0;
   function resize(){
     const w = hero.clientWidth; hh = hero.clientHeight;
@@ -740,7 +750,7 @@ void main(){
   }
   function draw(ms){
     mx += (mxGoal - mx) * .04;
-    gl.uniform2f(U.c, planet.cx * S, (hh - planet.cy) * S); gl.uniform1f(U.R, planet.R * S);
+    gl.uniform2f(U.c, planet.cx * S, (hh - planet.cy) * S); gl.uniform1f(U.R, planet.R * S); gl.uniform1f(U.Q, Math.min(planet.R, 760) * S);
     gl.uniform1f(U.t, ms / 1000); gl.uniform1f(U.mx, mx);
     gl.clearColor(0,0,0,0); gl.clear(gl.COLOR_BUFFER_BIT); gl.drawArrays(gl.TRIANGLES, 0, 3);
   }
