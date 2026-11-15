@@ -303,7 +303,66 @@ dialog.lb .bar p{margin:0 auto 0 0;color:var(--soft)}
 .badge dt{color:var(--muted)}.badge dd{margin:0;text-align:right}
 .badge .code{height:26px;margin-top:4px;opacity:.55;background:repeating-linear-gradient(90deg,#fff 0 2px,transparent 2px 5px,#fff 5px 6px,transparent 6px 10px,#fff 10px 13px,transparent 13px 15px)}
 .badge .acc{font:500 .64rem var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--db);text-align:center}
-footer{border-top:1px solid var(--line);padding-block:26px;color:var(--muted);font-size:.86rem}
+/* the hero melts into the page so the globe never ends on a hard line */
+.hero::after{content:"";position:absolute;left:0;right:0;bottom:0;height:clamp(140px,26%,260px);z-index:3;pointer-events:none;
+  background:linear-gradient(to bottom,transparent,rgba(7,8,10,.72) 55%,var(--bg) 96%)}
+#services{margin-top:-56px;z-index:4;padding-top:72px}
+#services::before{display:none}
+
+/* ---- micro-interactions ---- */
+.prog{position:fixed;left:0;top:0;width:100%;height:2px;z-index:60;transform-origin:0 50%;transform:scaleX(0);background:linear-gradient(90deg,var(--fe),var(--tl));pointer-events:none}
+#sparks{position:fixed;inset:0;width:100%;height:100%;z-index:90;pointer-events:none}
+.nav .bar{transition:background-color .3s ease,border-color .3s ease,box-shadow .3s ease}
+.nav.scrolled .bar{background:rgba(10,12,15,.86);border-color:var(--line-2)}
+.who i{animation:ping 2.2s ease-out infinite}
+@keyframes ping{0%{box-shadow:0 0 0 0 rgba(110,231,171,.55)}70%,100%{box-shadow:0 0 0 9px rgba(110,231,171,0)}}
+.btn.solid{position:relative;overflow:hidden}
+.btn.solid::after{content:"";position:absolute;inset:0;background:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.9) 50%,transparent 65%);transform:translateX(-120%);pointer-events:none}
+.wk .links .btn::before{content:"\2197";order:2;display:inline-block;transition:transform .2s var(--ease-out)}
+h2 .wd{display:inline-block;transition:opacity .6s var(--ease-out),transform .7s var(--ease-out);transition-delay:calc(var(--w) * 45ms)}
+h2.pre .wd{opacity:.25;transform:translateY(.35em)}
+.svc::before{transition:opacity .3s ease,left .4s var(--ease-out),right .4s var(--ease-out)}
+.svc .k{display:inline-block;transition:transform .3s var(--ease-out)}
+.svc li,.chips li,.wk .tags li{transition:transform .16s var(--ease-out),border-color .2s ease,color .2s ease}
+.how li{position:relative;transition:background-color .25s ease}
+.how li::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:2px;border-radius:2px;background:var(--fe);transform:scaleY(0);transition:transform .3s var(--ease-out)}
+.how li b,.how li span{transition:transform .3s var(--ease-out)}
+.poster .pv{transition:transform .6s var(--ease-out)}
+.ph.empty{transition:border-color .25s ease}
+.ph.empty div{transition:transform .3s var(--ease-out)}
+.rail button{transition:color .2s ease,transform .2s var(--ease-out)}
+.mail a.addr{background:linear-gradient(var(--text),var(--text)) 0 100%/0 1px no-repeat;transition:background-size .4s var(--ease-out)}
+#copy{transition:transform .16s var(--ease-out),background-color .2s ease,border-color .3s ease}
+#copy.ok{border-color:var(--db)}
+.lanyard .hint{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font:400 .72rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);transition:opacity .4s ease;animation:nudge 2.4s ease-in-out infinite}
+.lanyard .hint.gone{opacity:0}
+@keyframes nudge{50%{transform:translateX(-50%) translateY(-4px)}}
+@media (hover:hover) and (pointer:fine){
+  .btn.solid:hover::after{transform:translateX(120%);transition:transform .7s var(--ease-out)}
+  .wk .links .btn:hover::before{transform:translate(2px,-2px)}
+  .svc:hover::before{opacity:1;left:12px;right:12px}
+  .svc:hover .k{transform:translateX(4px)}
+  .svc li:hover,.chips li:hover,.wk .tags li:hover{transform:translateY(-2px);border-color:var(--c,var(--line-2));color:var(--text)}
+  .how li:hover{background:rgba(255,255,255,.025)}
+  .how li:hover::before{transform:scaleY(1)}
+  .how li:hover b,.how li:hover span{transform:translateX(6px)}
+  .poster:hover .pv{transform:scale(1.035)}
+  .ph.empty:hover{border-color:var(--muted)}
+  .ph.empty:hover div{transform:translateY(-4px)}
+  .rail button:hover{transform:translateX(4px);color:var(--text)}
+  .mail a.addr:hover{background-size:100% 1px}
+  .top:hover svg{transform:translateY(-3px)}
+  .brand:hover .dot{transform:scale(1.6)}
+}
+.brand .dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--db);margin-left:7px;vertical-align:middle;transition:transform .25s var(--ease-out)}
+footer{border-top:1px solid var(--line);padding-block:22px;color:var(--muted);font-size:.86rem}
+footer .wrap{align-items:center}
+footer .clock{font:400 .8rem var(--mono);font-variant-numeric:tabular-nums}
+footer .clock i{font-style:normal;animation:blinkc 1s steps(1) infinite}
+@keyframes blinkc{50%{opacity:.25}}
+.top{font:500 .86rem var(--sans);color:var(--soft);background:none;border:1px solid var(--line);border-radius:99px;padding:8px 14px;cursor:pointer;display:inline-flex;align-items:center;gap:7px;transition:transform .16s var(--ease-out),border-color .2s ease,color .2s ease}
+.top:active{transform:scale(.97)}
+.top svg{width:12px;height:12px;transition:transform .2s var(--ease-out)}
 footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
 .rv{opacity:.35;transform:translateY(14px);transition:opacity .7s var(--ease-out),transform .7s var(--ease-out);transition-delay:calc(var(--s,0) * 60ms)}
@@ -334,6 +393,8 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   html{scroll-behavior:auto}
   .now i{animation:none}
   .hero [data-in],h1 .w,.rot,.horizon{animation:fade .5s ease backwards}
+  .who i,.lanyard .hint,footer .clock i{animation:none}
+  h2.pre .wd{opacity:1;transform:none}
   .shiny,.feature::before,.p-st .nodes u::after,.p-au .ring{animation:none}
   .rv{opacity:1;transform:none}
   .btn{transition-property:background-color,border-color,color}
@@ -343,9 +404,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 </head>
 <body>
 
-<header class="nav">
+<div class="prog" id="prog" aria-hidden="true"></div>
+<canvas id="sparks" aria-hidden="true"></canvas>
+<header class="nav" id="nav">
   <div class="bar">
-    <a class="brand" href="#top">Abhiram Appani</a>
+    <a class="brand" href="#top">Abhiram Appani<span class="dot" aria-hidden="true"></span></a>
     <nav class="links" id="navlinks" aria-label="Sections">
       <span class="pill" aria-hidden="true"></span>
       <a class="l" href="#services">Services</a>
@@ -561,7 +624,11 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 </section>
 </main>
 
-<footer><div class="wrap"><span>Abhiram Appani</span><span>Full-stack developer and freelancer</span></div></footer>
+<footer><div class="wrap">
+  <span>&copy; <span id="yr">2026</span> Abhiram Appani</span>
+  <span class="clock">India <span id="clock">--<i>:</i>--</span> IST</span>
+  <button class="top" type="button" id="toTop">Back to top <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 10V2M2.5 5.5L6 2l3.5 3.5"/></svg></button>
+</div></footer>
 
 <script>
 /* ============ EDIT ME ============ */
@@ -955,12 +1022,74 @@ if (fine && !reduce){
   new IntersectionObserver(es => { visible = es[0].isIntersecting; if (visible){ if (!started){ started = true; fling(); } if (!raf) raf = requestAnimationFrame(loop); } }, {threshold:.25}).observe(box);
 })();
 
+/* ---------- micro-interactions ---------- */
+/* scroll progress and a nav that firms up once you leave the top */
+(function(){
+  const bar = $("#prog"), nav = $("#nav"); let tick = 0;
+  function upd(){ tick = 0; const max = document.documentElement.scrollHeight - innerHeight; bar.style.transform = `scaleX(${max > 0 ? Math.min(1, scrollY / max).toFixed(4) : 0})`; nav.classList.toggle("scrolled", scrollY > 40); }
+  addEventListener("scroll", () => { if (!tick) tick = requestAnimationFrame(upd); }, {passive:true}); upd();
+})();
+/* headings rise in word by word; section labels decode like a terminal */
+(function(){
+  if (reduce || !("IntersectionObserver" in window)) return;
+  const io = new IntersectionObserver(es => es.forEach(e => { if (!e.isIntersecting) return; io.unobserve(e.target);
+    if (e.target.matches("h2")) e.target.classList.remove("pre"); else decode(e.target); }), {rootMargin:"0px 0px -10% 0px"});
+  document.querySelectorAll("section h2").forEach(h => {
+    if (h.children.length) return;
+    h.setAttribute("aria-label", h.textContent);
+    h.innerHTML = h.textContent.trim().split(/\s+/).map((w,i) => `<span class="wd" aria-hidden="true" style="--w:${i}">${esc(w)}</span>`).join(" ");
+    if (h.getBoundingClientRect().top > innerHeight * .9){ h.classList.add("pre"); io.observe(h); }
+  });
+  const POOL = "ABCDEFGHJKLMNPRSTUVWXYZ/_#";
+  function decode(el){
+    const txt = el.dataset.t, t0 = performance.now(), dur = 700;
+    (function step(now){
+      const k = Math.min(1, (now - t0) / dur), done = Math.floor(k * txt.length);
+      el.textContent = txt.slice(0, done) + [...txt.slice(done)].map(c => c === " " ? " " : POOL[Math.random() * POOL.length | 0]).join("");
+      if (k < 1) requestAnimationFrame(step); else el.textContent = txt;
+    })(t0);
+  }
+  document.querySelectorAll(".eyebrow").forEach(el => { el.dataset.t = el.textContent; el.setAttribute("aria-label", el.textContent); if (el.getBoundingClientRect().top > innerHeight * .9) io.observe(el); });
+})();
+/* a small burst of sparks wherever you click */
+(function(){
+  if (reduce) return;
+  const cv = $("#sparks"), ctx = cv.getContext("2d"); let sparks = [], raf = 0, dpr = 1;
+  function size(){ dpr = Math.min(devicePixelRatio || 1, 2); cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; }
+  function draw(now){
+    ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,innerWidth,innerHeight); ctx.lineCap = "round"; ctx.lineWidth = 1.6;
+    sparks = sparks.filter(s => now - s.t < 420);
+    for (const s of sparks){
+      const k = (now - s.t) / 420, e = 1 - Math.pow(1 - k, 3), d0 = 6 + e * 22, len = 9 * (1 - e);
+      ctx.strokeStyle = `rgba(255,255,255,${(1 - k).toFixed(2)})`;
+      for (let i = 0; i < 8; i++){ const a = i * Math.PI / 4 + s.r; ctx.beginPath(); ctx.moveTo(s.x + Math.cos(a)*d0, s.y + Math.sin(a)*d0); ctx.lineTo(s.x + Math.cos(a)*(d0+len), s.y + Math.sin(a)*(d0+len)); ctx.stroke(); }
+    }
+    raf = sparks.length ? requestAnimationFrame(draw) : 0;
+  }
+  addEventListener("resize", size); size();
+  addEventListener("pointerdown", e => { if (e.button) return; sparks.push({x:e.clientX, y:e.clientY, t:performance.now(), r:Math.random()}); if (!raf) raf = requestAnimationFrame(draw); }, {passive:true});
+})();
+/* footer: live India time and a way back up */
+(function(){
+  const c = $("#clock"), f = new Intl.DateTimeFormat("en-GB", {timeZone:"Asia/Kolkata", hour:"2-digit", minute:"2-digit", hour12:false});
+  function tickc(){ const [h, m] = f.format(new Date()).split(":"); c.innerHTML = `${h}<i>:</i>${m}`; }
+  tickc(); setInterval(tickc, 20000);
+  $("#yr").textContent = new Date().getFullYear();
+  $("#toTop").addEventListener("click", () => scrollTo({top:0, behavior: reduce ? "auto" : "smooth"}));
+})();
+/* lanyard: a hint that goes away once you've grabbed the badge */
+(function(){
+  if (reduce) return;
+  const h = document.createElement("span"); h.className = "hint"; h.textContent = "Drag the badge"; $("#lanyard").appendChild(h);
+  $("#badge").addEventListener("pointerdown", () => h.classList.add("gone"), {once:true});
+})();
+
 /* ---------- copy email ---------- */
 (function(){
   const b = $("#copy"), s = b.firstElementChild; let t;
   function say(text){ b.classList.add("swap"); setTimeout(() => { s.textContent = text; b.classList.remove("swap"); }, 160); }
   b.addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText("abhiram.appani11@gmail.com"); say("Copied"); }
+    try { await navigator.clipboard.writeText("abhiram.appani11@gmail.com"); say("Copied"); b.classList.add("ok"); setTimeout(() => b.classList.remove("ok"), 2200); }
     catch (err) { say("Select the address to copy"); }
     clearTimeout(t); t = setTimeout(() => say("Copy address"), 2200);
   });
@@ -969,7 +1098,7 @@ if (fine && !reduce){
 /* ---------- scroll reveal (content stays readable without it) ---------- */
 if (!reduce && "IntersectionObserver" in window){
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }), {rootMargin:"0px 0px -8% 0px"});
-  document.querySelectorAll("section:not(#skills) h2, section .lede, .svc, .clients, .wk, .feature, .how, .ph, .mail").forEach(el => {
+  document.querySelectorAll("section .lede, .svc, .clients, .wk, .feature, .how, .ph, .mail").forEach(el => {
     if (el.getBoundingClientRect().top > innerHeight){
       const sib = el.matches(".svc") ? [...el.parentNode.children].indexOf(el) : 0;
       el.style.setProperty("--s", sib); el.classList.add("rv"); io.observe(el);
