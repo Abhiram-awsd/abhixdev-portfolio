@@ -46,7 +46,11 @@ section{padding-block:92px}
 .fig svg .f{transform:translate(calc(var(--lx,0) * 1px),calc(var(--ly,0) * 1px));transition:transform .2s ease-out}
 .fig svg [class^="pt-"]{transform-box:fill-box}
 .pt-tail{transform-origin:0% 100%;animation:wag 1.5s ease-in-out infinite alternate}
-[data-expr="happy"] .pt-tail,[data-expr="wow"] .pt-tail{animation-duration:.2s}
+:is([data-expr="happy"],[data-expr="wow"],[data-expr="love"],[data-expr="star"]) .pt-tail{animation-duration:.2s}
+.pt-jet{opacity:0;transform-origin:50% 0}
+.pt-armR{transform-origin:0% 0%}.pt-armL{transform-origin:100% 0%}
+:is([data-expr="happy"],[data-expr="love"]) .pt-armR{animation:wave .28s ease-in-out infinite alternate}
+@keyframes wave{from{transform:rotate(-105deg)}to{transform:rotate(-70deg)}}
 .pt-earL{transform-origin:85% 100%;animation:twitch 5.5s ease-in-out infinite}
 .pt-earR{transform-origin:15% 100%;animation:twitch 7s ease-in-out 1.3s infinite reverse}
 .pt-flopL{transform-origin:90% 5%;animation:flop 3.2s ease-in-out infinite}
@@ -54,7 +58,7 @@ section{padding-block:92px}
 .pt-lamp{animation:lamp 1.8s ease-in-out infinite}
 [data-expr="focus"] .pt-lamp{animation-duration:.7s}
 .pt-tongue{opacity:0;transform-origin:50% 0}
-[data-expr="happy"] .pt-tongue,[data-expr="wow"] .pt-tongue{opacity:1;animation:pant .22s ease-in-out infinite alternate}
+:is([data-expr="happy"],[data-expr="wow"],[data-expr="love"],[data-expr="star"],[data-expr="wink"]) .pt-tongue{opacity:1;animation:pant .22s ease-in-out infinite alternate}
 .fig.hop{animation:hop .5s cubic-bezier(.3,1.6,.6,1) 2}
 @keyframes breathe{50%{transform:scale(1.025,.975)}}
 @keyframes float{50%{transform:translateY(-5px)}}
@@ -99,19 +103,27 @@ nav a.l{color:var(--muted);text-decoration:none;font-size:.94rem}
 .opt.txt{flex-direction:row;min-width:0;padding:12px 18px}
 
 /* features */
-.feats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:44px}
+.feats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:44px}
 .feat{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:26px;transition:border-color .2s ease,transform .25s var(--ease)}
 .feat b{display:block;font:700 1.35rem var(--pixel);margin-bottom:8px}
 .feat span{color:var(--muted);font-size:.98rem}
 .feat i{display:block;width:34px;height:6px;border-radius:99px;background:var(--cyan);margin-bottom:18px}
 .feat:nth-child(3n+2) i{background:var(--orange)}.feat:nth-child(3n) i{background:var(--go)}
+.feat kbd{font:600 .8rem ui-monospace,Menlo,Consolas,monospace;background:var(--panel-2);border:1px solid var(--line-2);border-radius:6px;padding:1px 6px;color:var(--ink)}
 @media (hover:hover){.feat:hover{border-color:var(--line-2);transform:translateY(-3px)}}
 
 /* cast */
-.cast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:44px}
+.cast{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;margin-top:44px}
 .member{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:20px 16px;text-align:center}
 .member .looks{display:flex;justify-content:center;gap:8px;margin-bottom:14px}
-.member .fig{width:58px;height:58px}
+.member .fig{width:46px;height:46px}
+.member .looks{gap:4px}
+.exprs{margin-top:20px}
+.exprs .opt.txt{padding:9px 14px;font-size:.88rem}
+.ver{display:inline-block;font:600 .8rem var(--body);color:var(--cyan);border:1px solid rgba(61,240,255,.4);border-radius:99px;padding:4px 12px;margin-bottom:22px}
+.note{margin-top:22px;border:1px solid var(--line);border-radius:14px;padding:16px 18px;color:#d3d8f2;font-size:.94rem}
+.note b{display:block;color:var(--ink);margin-bottom:4px}
+.note code{font:400 .86rem ui-monospace,Menlo,Consolas,monospace;background:#0e1126;border-radius:6px;padding:2px 6px}
 .member b{display:block;font:700 1.4rem var(--pixel)}
 .member span{color:var(--muted);font-size:.9rem}
 
@@ -128,6 +140,7 @@ pre i{font-style:normal;color:var(--muted)}
 footer{border-top:1px solid var(--line);padding-block:24px;color:var(--muted);font-size:.88rem}
 footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
+@media (max-width:1000px){.feats{grid-template-columns:repeat(2,minmax(0,1fr))}.cast{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:860px){.picker,.two{grid-template-columns:1fr}.feats{grid-template-columns:1fr}.cast{grid-template-columns:repeat(2,minmax(0,1fr))}nav a.l{display:none}section{padding-block:68px}}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
@@ -141,10 +154,12 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
 <main id="top">
 <div class="hero"><div class="wrap">
+  <span class="ver">Version 0.4.0 is out</span>
   <h1>A tiny figurine that <em>keeps you on track.</em></h1>
-  <p>Deskling lives on your desktop. It runs your focus sessions, holds today's tasks and reminds you to drink water, without ever getting in the way.</p>
+  <p>Deskling lives on your desktop. It runs your focus sessions, holds today's tasks and reminds you about the things you'd forget, without ever getting in the way.</p>
   <div class="cta">
-    <a class="btn go" href="https://github.com/Abhiram-awsd/Deskling/releases">Download Deskling</a>
+    <a class="btn go" href="https://github.com/Abhiram-awsd/Deskling/releases/latest">Download Deskling</a>
+    <a class="btn" href="https://deskling-six.vercel.app">Open the live demo</a>
     <button class="btn" type="button" id="focusBtn">Try a 10-second focus session</button>
   </div>
   <p class="os">Free and open source. Windows, macOS and Linux.</p>
@@ -157,12 +172,13 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
 <section id="pick" style="padding-top:64px"><div class="wrap">
   <p class="kick">Make it yours</p>
-  <h2>4 characters, 3 looks</h2>
-  <p class="lede">Pick one here and the figurine on the desk above changes with it. In the app, tails wag, ears twitch and lamps blink.</p>
+  <h2>5 buddies, 3 looks, 13 moods</h2>
+  <p class="lede">Pick one here and the buddy on the desk above changes with it. They blink, wink, yawn, get dizzy and go starry-eyed when you finish a task.</p>
   <div class="picker">
     <div class="box"><h3>Character</h3><div class="row" id="chars"></div></div>
     <div class="box"><h3>Look</h3><div class="row" id="looks"></div></div>
   </div>
+  <div class="box exprs"><h3>Mood</h3><div class="row" id="exprs"></div></div>
   <div class="cast" id="cast"></div>
 </div></section>
 
@@ -170,12 +186,14 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <p class="kick">What it does</p>
   <h2>Small helper, full day</h2>
   <div class="feats">
-    <div class="feat"><i></i><b>Focus timer</b><span>Pomodoro sessions with short and long breaks. The countdown sits right under the figurine.</span></div>
+    <div class="feat"><i></i><b>Focus timer</b><span>Pomodoro sessions with short and long breaks. The countdown sits right under the buddy.</span></div>
     <div class="feat"><i></i><b>Tasks</b><span>A short list for today, plus the one thing that would make the day a win.</span></div>
-    <div class="feat"><i></i><b>Reminders</b><span>Water, stretch, eye rest and posture. They wait until your focus session ends.</span></div>
-    <div class="feat"><i></i><b>Days</b><span>Your streak, focus minutes for the last seven days and today's tally.</span></div>
-    <div class="feat"><i></i><b>Check-ins</b><span>A morning check-in to set the day up and an evening recap to close it.</span></div>
-    <div class="feat"><i></i><b>Three ways to live</b><span>It sits where you drag it, walks along the bottom of the screen, or hides in the tray until needed.</span></div>
+    <div class="feat"><i></i><b>Reminders</b><span>"Remind me in 40 min", or pick a date and time on the built-in calendar. Once, every day or on weekdays.</span></div>
+    <div class="feat"><i></i><b>Quick add</b><span>Press <kbd>Ctrl</kbd> <kbd>Alt</kbd> <kbd>Space</kbd> anywhere and type "buy milk" or "call mom in 40 min".</span></div>
+    <div class="feat"><i></i><b>Wellbeing nudges</b><span>Water, stretch, eye rest and posture. They wait until your focus session ends.</span></div>
+    <div class="feat"><i></i><b>Days</b><span>Your streak, this week against last week, and a Sunday report you can copy.</span></div>
+    <div class="feat"><i></i><b>Three ways to live</b><span>It sits where you drag it, roams the bottom of the screen, or hides in the tray until needed.</span></div>
+    <div class="feat"><i></i><b>Update check</b><span>It tells you when a newer release is out and opens the download page.</span></div>
   </div>
 </div></section>
 
@@ -184,25 +202,27 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
     <p class="kick">Why it is light</p>
     <h2>Barely there</h2>
     <ul class="light">
-      <li>Built on Tauri, so it uses the webview your system already has instead of bundling a browser.</li>
+      <li>Built on Tauri, so it uses the webview your system already has. The Windows installer is about 1 MB.</li>
       <li>One small window that is only ever as big as what is on screen.</li>
-      <li>No framework, no bundler and no image files. Every character is drawn from about 100 lines of shape data.</li>
+      <li>No framework, no bundler and no image files. Each character is drawn from a few dozen lines of shape data.</li>
       <li>No timers of its own while idle. The shell sends one tick a second.</li>
-      <li>Everything is stored locally. No account and no network requests.</li>
+      <li>Everything is stored on your own computer. There is no account and no server.</li>
+      <li>The only network request is a once-a-day update check, and you can turn it off.</li>
     </ul>
   </div>
   <div>
     <p class="kick">Install</p>
     <h2>Get it running</h2>
     <ol class="steps">
-      <li>Download the installer for your system from the Releases page.</li>
+      <li>Download the installer for your system from the latest release.</li>
       <li>Open it. Deskling appears on your desktop.</li>
-      <li>Click the figurine to open the panel. Drag it to move it.</li>
+      <li>Click the buddy to open the panel. Drag it to move it. Right-click it for a trick.</li>
     </ol>
+    <div class="note"><b>First launch</b>The builds are not code-signed yet. On Windows, click <b style="display:inline">More info</b> then <b style="display:inline">Run anyway</b>. On macOS, open System Settings, go to Privacy &amp; Security and click <b style="display:inline">Open Anyway</b>.</div>
     <pre><i># or build from source (needs Rust and Node.js)</i>
 npm install
 npm run dev</pre>
-    <div class="cta" style="justify-content:flex-start;margin-top:22px"><a class="btn go" href="https://github.com/Abhiram-awsd/Deskling/releases">Go to Releases</a><a class="btn" href="https://github.com/Abhiram-awsd/Deskling">View the source</a></div>
+    <div class="cta" style="justify-content:flex-start;margin-top:22px"><a class="btn go" href="https://github.com/Abhiram-awsd/Deskling/releases/latest">Get the latest release</a><a class="btn" href="https://deskling-six.vercel.app">Try it in the browser</a><a class="btn" href="https://github.com/Abhiram-awsd/Deskling">View the source</a></div>
   </div>
 </div></section>
 </main>
@@ -214,7 +234,7 @@ npm run dev</pre>
 /* The figurines on this page are drawn by Deskling's own characters.js, the same file the app ships. */
 const $ = s => document.querySelector(s);
 const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-const { CHARS, mount } = window.Buddy;
+const { CHARS, EXPRS, mount } = window.Buddy;
 const LOOKS = [["soft","Soft"],["pixel","Pixel"],["neon","Neon"]];
 let char = CHARS[0].id, look = "soft", busy = false;
 
@@ -236,6 +256,10 @@ $("#chars").addEventListener("click", e => { const b = e.target.closest("button"
 $("#looks").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; look = b.dataset.l; paint(); say(`${b.textContent} look. Nice choice.`); mood("wow", 1200); });
 paint();
 
+/* every mood */
+$("#exprs").innerHTML = EXPRS.map(x => `<button class="opt txt" type="button" data-x="${x}">${x[0].toUpperCase() + x.slice(1)}</button>`).join("");
+$("#exprs").addEventListener("click", e => { const b = e.target.closest("button"); if (!b || busy) return; hero.set({expr:b.dataset.x}); say(`This is my ${b.dataset.x} face.`); clearTimeout(window.__m); window.__m = setTimeout(() => { if (!busy) hero.set({expr:"idle"}); }, 2600); });
+
 /* the whole cast, every look */
 $("#cast").innerHTML = CHARS.map(c => `<div class="member"><div class="looks">${LOOKS.map(([k]) => `<span class="fig" data-c="${c.id}" data-k="${k}"></span>`).join("")}</div><b>${c.name}</b><span>the ${c.kind}</span></div>`).join("");
 document.querySelectorAll("#cast .fig").forEach(el => mount(el, {char:el.dataset.c, look:el.dataset.k, expr:"idle"}));
@@ -248,9 +272,9 @@ if (!reduce){
 }
 
 /* poke it */
-const LINES = ["Hey!", "That tickles.", "Back to work, you.", "Have you had water today?", "One thing at a time."];
+const LINES = [["Hey!","happy"],["That tickles.","wink"],["Whoa, easy.","dizzy"],["You're the best.","love"],["Back to work, you.","smug"],["Have you had water today?","idle"]];
 let poke = 0;
-$("#pet").addEventListener("click", () => { if (busy) return; const f = $("#hero"); f.classList.remove("hop"); void f.offsetWidth; if (!reduce) f.classList.add("hop"); say(LINES[poke++ % LINES.length]); mood("happy", 1300); });
+$("#pet").addEventListener("click", () => { if (busy) return; const f = $("#hero"); f.classList.remove("hop"); void f.offsetWidth; if (!reduce) f.classList.add("hop"); const [t, x] = LINES[poke++ % LINES.length]; say(t); mood(x, 1500); });
 $("#hero").addEventListener("animationend", e => { if (e.animationName === "hop") $("#hero").classList.remove("hop"); });
 
 /* a ten-second focus session */
@@ -258,7 +282,7 @@ $("#focusBtn").addEventListener("click", () => {
   if (busy) return; busy = true; let left = 10; const t = $("#timer"), btn = $("#focusBtn");
   btn.disabled = true; btn.textContent = "Focusing..."; t.hidden = false; t.textContent = "0:10"; hero.set({expr:"focus"}); say("Focus time. I'll keep watch.");
   const iv = setInterval(() => { left--; t.textContent = "0:" + String(left).padStart(2, "0");
-    if (left <= 0){ clearInterval(iv); busy = false; t.hidden = true; btn.disabled = false; btn.textContent = "Try another focus session"; say("Done. Take a short break."); mood("happy", 2600);
+    if (left <= 0){ clearInterval(iv); busy = false; t.hidden = true; btn.disabled = false; btn.textContent = "Try another focus session"; say("Done. Take a short break."); mood("star", 2600);
       const f = $("#hero"); if (!reduce){ f.classList.remove("hop"); void f.offsetWidth; f.classList.add("hop"); } } }, 1000);
 });
 </script>
