@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Abhiram Appani | Full-stack developer</title>
-<meta name="description" content="Abhiram Appani is a full-stack developer and freelancer building web products and AI automations for clients in India and the United States.">
+<meta name="description" content="Abhiram Appani is a full-stack developer and freelancer building web products and AI automations for clients around the world.">
 <meta property="og:title" content="Abhiram Appani | Full-stack developer">
 <meta property="og:description" content="Web products and AI automations, designed, built and shipped end to end.">
 <meta name="theme-color" content="#07080a">
@@ -245,7 +245,7 @@ h1 .w{display:inline-block;animation:blur-in .9s var(--ease-out) backwards;anima
 .about{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:56px;align-items:start}
 .about p .sw{transition:opacity .2s linear}
 .about p{color:var(--soft);font-size:1.08rem;max-width:58ch;margin:20px 0 0}
-.how{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.how{position:relative;list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
 .how li{padding:18px 22px;border-bottom:1px solid var(--line)}
 .how li:last-child{border-bottom:0}
 .how b{display:block;font-weight:500;margin-bottom:2px}
@@ -280,11 +280,36 @@ dialog.lb .bar p{margin:0 auto 0 0;color:var(--soft)}
 .contact::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(50% 70% at 50% 110%,rgba(108,199,255,.12),transparent 70%)}
 .contact h2{font-size:clamp(2.6rem,7vw,5rem);letter-spacing:-.05em;max-width:13ch;background:linear-gradient(180deg,#fff 35%,#a4aab6);-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.08em}
 .contact h2 em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:-.02em}
-.mail{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:38px}
-.mail a.addr{font:500 clamp(1rem,3.2vw,1.4rem) var(--mono);text-decoration:none;border-bottom:1px solid var(--line-2);padding-bottom:4px;overflow-wrap:anywhere;transition:border-color .2s ease}
-@media (hover:hover) and (pointer:fine){.mail a.addr:hover{border-bottom-color:var(--text)}}
-#copy span{display:inline-block;transition:opacity .2s ease,filter .2s ease}
-#copy.swap span{opacity:0;filter:blur(3px)}
+.mail{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-top:38px}
+.mail .addr{font:400 .86rem var(--mono);color:var(--muted);overflow-wrap:anywhere;user-select:all}
+/* Specular Button: glass with an edge that catches the light where the cursor is */
+.spec{--mx:50%;--my:0%;position:relative;display:inline-flex;align-items:center;gap:12px;font:500 1.08rem/1 var(--sans);letter-spacing:-.01em;color:var(--text);text-decoration:none;
+  padding:19px 30px;border-radius:99px;isolation:isolate;overflow:hidden;
+  background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(255,255,255,.03));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.28),inset 0 -1px 0 rgba(255,255,255,.05),0 14px 40px rgba(0,0,0,.5);
+  transition:transform .16s var(--ease-out),box-shadow .3s ease}
+.spec:active{transform:scale(.97)}
+.spec::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.2px;pointer-events:none;z-index:1;
+  background:radial-gradient(140px circle at var(--mx) var(--my),#fff,rgba(255,255,255,.5) 30%,rgba(255,255,255,.12) 62%,rgba(255,255,255,.08));
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.spec::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;opacity:var(--on,0);transition:opacity .3s ease;
+  background:radial-gradient(180px circle at var(--mx) var(--my),rgba(160,205,255,.34),transparent 65%)}
+.spec svg{width:18px;height:18px;transition:transform .25s var(--ease-out)}
+@media (hover:hover) and (pointer:fine){.spec:hover{box-shadow:inset 0 1px 0 rgba(255,255,255,.4),inset 0 -1px 0 rgba(255,255,255,.08),0 18px 50px rgba(0,0,0,.55),0 0 40px rgba(108,199,255,.14)}.spec:hover svg{transform:translate(2px,-2px)}}
+/* Border Glow: a mesh-gradient edge that points at the cursor and brightens near the border */
+.bglow{position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:2;opacity:0;transition:opacity .35s ease;
+  background:conic-gradient(from calc(var(--ang,0deg) - 75deg),transparent 0deg,var(--fe) 28deg,var(--tl) 58deg,#fff 75deg,var(--db) 92deg,var(--be) 122deg,transparent 150deg,transparent 360deg);
+  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+.bglow.line{padding:1.5px}
+.bglow.haze{padding:22px;filter:blur(16px);z-index:1}
+/* Gradual Blur: the page goes softly out of focus at the bottom edge of the screen */
+.gblur{position:fixed;left:0;right:0;bottom:0;height:88px;z-index:25;pointer-events:none;transition:opacity .4s ease}
+.gblur.off{opacity:0}
+.gblur i{position:absolute;inset:0}
+.gblur::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,transparent,rgba(7,8,10,.55))}
+.visits{font:400 .8rem var(--mono);font-variant-numeric:tabular-nums}
+.visits b{font-weight:500;color:var(--text)}
+.visits[hidden]{display:none}
 .contact .cta{margin-top:24px}
 .cgrid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.75fr);gap:24px;align-items:start}
 .lanyard{position:relative;height:600px;margin-top:-104px;margin-bottom:-60px;perspective:1100px}
@@ -331,9 +356,6 @@ h2.pre .wd{opacity:.25;transform:translateY(.35em)}
 .ph.empty{transition:border-color .25s ease}
 .ph.empty div{transition:transform .3s var(--ease-out)}
 .rail button{transition:color .2s ease,transform .2s var(--ease-out)}
-.mail a.addr{background:linear-gradient(var(--text),var(--text)) 0 100%/0 1px no-repeat;transition:background-size .4s var(--ease-out)}
-#copy{transition:transform .16s var(--ease-out),background-color .2s ease,border-color .3s ease}
-#copy.ok{border-color:var(--db)}
 .lanyard .hint{position:absolute;left:50%;bottom:6px;transform:translateX(-50%);font:400 .72rem var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);transition:opacity .4s ease;animation:nudge 2.4s ease-in-out infinite}
 .lanyard .hint.gone{opacity:0}
 @keyframes nudge{50%{transform:translateX(-50%) translateY(-4px)}}
@@ -350,7 +372,6 @@ h2.pre .wd{opacity:.25;transform:translateY(.35em)}
   .ph.empty:hover{border-color:var(--muted)}
   .ph.empty:hover div{transform:translateY(-4px)}
   .rail button:hover{transform:translateX(4px);color:var(--text)}
-  .mail a.addr:hover{background-size:100% 1px}
   .top:hover svg{transform:translateY(-3px)}
   .brand:hover .dot{transform:scale(1.6)}
 }
@@ -430,7 +451,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
       <span class="l1" aria-hidden="true"><span class="w" style="--d:0">I</span> <span class="w" style="--d:1">design,</span> <span class="w" style="--d:2">build</span> <span class="w" style="--d:3">and</span> <span class="w" style="--d:4">ship</span></span>
       <span class="rot" id="rot" aria-hidden="true">web apps.</span>
     </h1>
-    <p class="intro" data-in style="--d:6">I'm Abhiram Appani, a full-stack developer and freelancer. I take products from the first screen to the database for clients in India and the United States.</p>
+    <p class="intro" data-in style="--d:6">I'm Abhiram Appani, a full-stack developer and freelancer. I take products from the first screen to the database for clients around the world.</p>
     <div class="cta" data-in style="--d:7">
       <span class="magnet"><a class="btn solid round" href="#contact">Start a project <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 7h10M8 3l4 4-4 4"/></svg></a></span>
       <span class="magnet"><a class="btn round" href="#projects">View work</a></span>
@@ -460,7 +481,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
         <ul><li>Workflow automation</li><li>AI integrations</li><li>Custom tooling</li></ul>
       </article>
     </div>
-    <p class="clients"><b>Freelance experience</b>Web and AI automation projects delivered for clients in India and the United States.</p>
+    <p class="clients"><b>Freelance experience</b>Web and AI automation projects delivered for international clients across time zones.</p>
   </div>
 </section>
 
@@ -570,14 +591,14 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
     <div>
       <p class="eyebrow">About</p>
       <h2>I like owning the whole feature</h2>
-      <p id="aboutLead">I'm a full-stack developer and freelancer. I've worked with clients in India and the United States on web design, web development and custom AI automations.</p>
+      <p id="aboutLead">I'm a full-stack developer and freelancer. I've worked with clients around the world on web design, web development and custom AI automations.</p>
       <p>I enjoy the parts of a product that users never see as much as the parts they do. A good schema, a clean API and a fast interface are the same job to me.</p>
     </div>
     <ul class="how">
       <li><b>Typed from end to end</b><span>TypeScript on the client and the server, with validation on every request in between.</span></li>
       <li><b>Built to be handed over</b><span>Setup steps, environment examples and documentation come with the code.</span></li>
       <li><b>Deployed, not just pushed</b><span>Every finished project gets a production build and a live URL.</span></li>
-      <li><b>Clear communication</b><span>Used to working across time zones with clients in India and the US.</span></li>
+      <li><b>Clear communication</b><span>Used to working across time zones with international clients.</span></li>
     </ul>
   </div>
 </section>
@@ -600,10 +621,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
   <div>
     <p class="eyebrow">Contact</p>
     <h2>Let's build <em>something.</em></h2>
-    <p class="lede">Have a website, a web app or an automation in mind? Send me a few lines about it and I'll reply with next steps.</p>
+    <p class="lede">Have a website, a web app or an automation in mind? I work with clients in any time zone. Send me a few lines about it and I'll reply with next steps.</p>
     <div class="mail">
-      <a class="addr" href="mailto:abhiram.appani11@gmail.com">abhiram.appani11@gmail.com</a>
-      <button class="btn sm" id="copy" type="button"><span>Copy address</span></button>
+      <a class="spec" id="mailBtn" href="mailto:abhiram.appani11@gmail.com?subject=Project%20enquiry">Email me <svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 13L13 5M6.5 5H13v6.5"/></svg></a>
+      <span class="addr">abhiram.appani11@gmail.com</span>
     </div>
     <div class="cta">
       <span class="magnet"><a class="btn round" href="https://www.linkedin.com/in/abhiram-appani-7a2b0636a/">LinkedIn</a></span>
@@ -616,7 +637,7 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
       <span class="stripes"><i data-l="fe"></i><i data-l="be"></i><i data-l="db"></i><i data-l="tl"></i></span>
       <span class="face">AA</span>
       <b>Abhiram Appani</b><span class="role">Full-stack developer</span>
-      <dl><dt>Works with</dt><dd>India and US</dd><dt>Builds</dt><dd>Web and AI</dd><dt>Status</dt><dd>Available</dd></dl>
+      <dl><dt>Works with</dt><dd>Worldwide</dd><dt>Builds</dt><dd>Web and AI</dd><dt>Status</dt><dd>Available</dd></dl>
       <span class="code"></span><span class="acc">Full stack access</span>
     </div>
   </div>
@@ -624,8 +645,10 @@ footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 </section>
 </main>
 
+<div class="gblur" id="gblur" aria-hidden="true"></div>
 <footer><div class="wrap">
   <span>&copy; <span id="yr">2026</span> Abhiram Appani</span>
+  <span class="visits" id="visits" hidden><b id="visitN">0</b> visits so far</span>
   <span class="clock">India <span id="clock">--<i>:</i>--</span> IST</span>
   <button class="top" type="button" id="toTop">Back to top <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 10V2M2.5 5.5L6 2l3.5 3.5"/></svg></button>
 </div></footer>
@@ -1084,15 +1107,53 @@ if (fine && !reduce){
   $("#badge").addEventListener("pointerdown", () => h.classList.add("gone"), {once:true});
 })();
 
-/* ---------- copy email ---------- */
+/* ---------- Specular Button: the edge highlight follows the cursor ---------- */
 (function(){
-  const b = $("#copy"), s = b.firstElementChild; let t;
-  function say(text){ b.classList.add("swap"); setTimeout(() => { s.textContent = text; b.classList.remove("swap"); }, 160); }
-  b.addEventListener("click", async () => {
-    try { await navigator.clipboard.writeText("abhiram.appani11@gmail.com"); say("Copied"); b.classList.add("ok"); setTimeout(() => b.classList.remove("ok"), 2200); }
-    catch (err) { say("Select the address to copy"); }
-    clearTimeout(t); t = setTimeout(() => say("Copy address"), 2200);
+  const b = $("#mailBtn"); if (!fine) return;
+  b.addEventListener("pointermove", e => { const r = b.getBoundingClientRect(); b.style.setProperty("--mx", (e.clientX - r.left) + "px"); b.style.setProperty("--my", (e.clientY - r.top) + "px"); b.style.setProperty("--on", 1); });
+  b.addEventListener("pointerleave", () => { b.style.setProperty("--on", 0); b.style.setProperty("--mx", "50%"); b.style.setProperty("--my", "0%"); });
+})();
+
+/* ---------- Border Glow on cards ---------- */
+if (fine) document.querySelectorAll(".spot, .how, .ph").forEach(c => {
+  const line = document.createElement("i"), haze = document.createElement("i");
+  line.className = "bglow line"; haze.className = "bglow haze"; line.setAttribute("aria-hidden", "true"); haze.setAttribute("aria-hidden", "true"); c.append(haze, line);
+  c.addEventListener("pointermove", e => {
+    const r = c.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
+    const ang = (Math.atan2(y - r.height / 2, x - r.width / 2) * 180 / Math.PI + 90).toFixed(1) + "deg";
+    const edge = 1 - Math.min(1, Math.min(x, y, r.width - x, r.height - y) / 140);     /* 1 at the border, 0 deep inside */
+    line.style.setProperty("--ang", ang); haze.style.setProperty("--ang", ang);
+    line.style.opacity = (.35 + .65 * edge).toFixed(2); haze.style.opacity = (.12 + .5 * edge).toFixed(2);
   });
+  c.addEventListener("pointerleave", () => { line.style.opacity = 0; haze.style.opacity = 0; });
+});
+
+/* ---------- Gradual Blur at the bottom edge of the screen ---------- */
+(function(){
+  const g = $("#gblur"), N = 6; let tick = 0;
+  g.innerHTML = Array.from({length:N}, (_,i) => { const a = i * 100 / (N + 2), b = (i + 1) * 100 / (N + 2), c = (i + 2) * 100 / (N + 2), d = (i + 3) * 100 / (N + 2), px = (.6 * Math.pow(1.75, i)).toFixed(2);
+    const m = `linear-gradient(to bottom,transparent ${a}%,#000 ${b}%,#000 ${c}%,${i === N - 1 ? "#000" : "transparent"} ${d}%)`;
+    return `<i style="backdrop-filter:blur(${px}px);-webkit-backdrop-filter:blur(${px}px);mask-image:${m};-webkit-mask-image:${m}"></i>`; }).join("");
+  function upd(){ tick = 0; g.classList.toggle("off", scrollY + innerHeight > document.documentElement.scrollHeight - 140); }
+  addEventListener("scroll", () => { if (!tick) tick = requestAnimationFrame(upd); }, {passive:true}); upd();
+})();
+
+/* ---------- visit counter (Count Up). The number is real: it comes from a public counting service
+   and the line stays hidden if that service can't be reached. ---------- */
+(function(){
+  const wrap = $("#visits"), out = $("#visitN"), KEY = "abhixdev-portfolio/visits";
+  let seen = false; try { seen = sessionStorage.getItem("counted") === "1"; } catch (e) {}
+  fetch(`https://abacus.jasoncameron.dev/${seen ? "get" : "hit"}/${KEY}`).then(r => r.ok ? r.json() : Promise.reject()).then(d => {
+    const n = Number(d.value); if (!Number.isFinite(n) || n < 1) return;
+    try { sessionStorage.setItem("counted", "1"); } catch (e) {}
+    wrap.hidden = false;
+    const show = v => out.textContent = Math.round(v).toLocaleString("en-IN");
+    if (reduce || !("IntersectionObserver" in window)) return show(n);
+    new IntersectionObserver((es, io) => { if (!es[0].isIntersecting) return; io.disconnect();
+      const t0 = performance.now(), dur = 1600;
+      (function step(now){ const k = Math.min(1, (now - t0) / dur); show(n * (1 - Math.pow(2, -10 * k)) / (1 - Math.pow(2, -10))); if (k < 1) requestAnimationFrame(step); })(t0);
+    }).observe(wrap);
+  }).catch(() => {});
 })();
 
 /* ---------- scroll reveal (content stays readable without it) ---------- */
