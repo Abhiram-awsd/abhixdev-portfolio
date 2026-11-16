@@ -245,7 +245,7 @@ h1 .w{display:inline-block;animation:blur-in .9s var(--ease-out) backwards;anima
 .about{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:56px;align-items:start}
 .about p .sw{transition:opacity .2s linear}
 .about p{color:var(--soft);font-size:1.08rem;max-width:58ch;margin:20px 0 0}
-.how{position:relative;list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
+.how{position:relative;overflow:hidden;list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
 .how li{padding:18px 22px;border-bottom:1px solid var(--line)}
 .how li:last-child{border-bottom:0}
 .how b{display:block;font-weight:500;margin-bottom:2px}
@@ -301,7 +301,14 @@ dialog.lb .bar p{margin:0 auto 0 0;color:var(--soft)}
   background:conic-gradient(from calc(var(--ang,0deg) - 75deg),transparent 0deg,var(--fe) 28deg,var(--tl) 58deg,#fff 75deg,var(--db) 92deg,var(--be) 122deg,transparent 150deg,transparent 360deg);
   -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
 .bglow.line{padding:1.5px}
-.bglow.haze{padding:22px;filter:blur(16px);z-index:1}
+.bglow.haze{z-index:1;-webkit-mask:none;mask:none;
+  -webkit-mask-image:linear-gradient(to right,rgba(0,0,0,.55),transparent 64px),linear-gradient(to left,rgba(0,0,0,.55),transparent 64px),linear-gradient(to bottom,rgba(0,0,0,.55),transparent 64px),linear-gradient(to top,rgba(0,0,0,.55),transparent 64px);
+  mask-image:linear-gradient(to right,rgba(0,0,0,.55),transparent 64px),linear-gradient(to left,rgba(0,0,0,.55),transparent 64px),linear-gradient(to bottom,rgba(0,0,0,.55),transparent 64px),linear-gradient(to top,rgba(0,0,0,.55),transparent 64px);
+  -webkit-mask-composite:source-over;mask-composite:add}
+/* stop-scroll stack: each project pins, the next slides over it, and the ones underneath shrink and blur */
+.stacked .work{display:block}
+.stacked .wk{position:sticky;top:calc(92px + var(--i,0) * 16px);margin-bottom:26px;transform-origin:50% 0;will-change:transform,filter}
+.stacked .wk:last-child{margin-bottom:0}
 /* Gradual Blur: the page goes softly out of focus at the bottom edge of the screen */
 .gblur{position:fixed;left:0;right:0;bottom:0;height:88px;z-index:25;pointer-events:none;transition:opacity .4s ease}
 .gblur.off{opacity:0}
@@ -1128,6 +1135,27 @@ if (fine) document.querySelectorAll(".spot, .how, .ph").forEach(c => {
   c.addEventListener("pointerleave", () => { line.style.opacity = 0; haze.style.opacity = 0; });
 });
 
+/* ---------- stop-scroll project stack ---------- */
+(function(){
+  const cards = [...document.querySelectorAll("#projects .wk")]; if (!cards.length) return;
+  const mq = matchMedia("(min-width: 921px) and (min-height: 620px)"); let on = false, tick = 0;
+  cards.forEach((c,i) => c.style.setProperty("--i", i));
+  function upd(){
+    tick = 0; if (!on) return;
+    const rects = cards.map(c => c.getBoundingClientRect());
+    cards.forEach((c,i) => {
+      let p = 0;                                   /* how far the cards after this one have covered it, 0 to 1 (and beyond for deeper ones) */
+      for (let j = i + 1; j < cards.length; j++){ const cover = (rects[i].top + rects[i].height - rects[j].top) / rects[i].height; p += Math.max(0, Math.min(1, cover)); }
+      if (p <= .001){ c.style.transform = ""; c.style.filter = ""; return; }
+      c.style.transform = `scale(${(1 - Math.min(p, 3) * .035).toFixed(4)})`;
+      c.style.filter = `blur(${Math.min(p * 3.5, 9).toFixed(2)}px) brightness(${(1 - Math.min(p, 3) * .16).toFixed(3)})`;
+    });
+  }
+  function mode(){ on = mq.matches && !reduce; document.documentElement.classList.toggle("stacked", on); if (!on) cards.forEach(c => { c.style.transform = ""; c.style.filter = ""; }); upd(); }
+  addEventListener("scroll", () => { if (!tick) tick = requestAnimationFrame(upd); }, {passive:true});
+  addEventListener("resize", upd); mq.addEventListener("change", mode); mode();
+})();
+
 /* ---------- Gradual Blur at the bottom edge of the screen ---------- */
 (function(){
   const g = $("#gblur"), N = 6; let tick = 0;
@@ -1159,7 +1187,7 @@ if (fine) document.querySelectorAll(".spot, .how, .ph").forEach(c => {
 /* ---------- scroll reveal (content stays readable without it) ---------- */
 if (!reduce && "IntersectionObserver" in window){
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }), {rootMargin:"0px 0px -8% 0px"});
-  document.querySelectorAll("section .lede, .svc, .clients, .wk, .feature, .how, .ph, .mail").forEach(el => {
+  document.querySelectorAll("section .lede, .svc, .clients, .feature, .how, .ph, .mail").forEach(el => {
     if (el.getBoundingClientRect().top > innerHeight){
       const sib = el.matches(".svc") ? [...el.parentNode.children].indexOf(el) : 0;
       el.style.setProperty("--s", sib); el.classList.add("rv"); io.observe(el);
