@@ -1,9 +1,8 @@
-import { Component, useRef, useState } from 'react';
+import { Component, useState } from 'react';
 
 import Aurora from './bits/Aurora/Aurora.jsx';
 import Threads from './bits/Threads/Threads.jsx';
 import DotGrid from './bits/DotGrid/DotGrid.jsx';
-import Orb from './bits/Orb/Orb.jsx';
 import Particles from './bits/Particles/Particles.jsx';
 
 import SplitText from './bits/SplitText/SplitText.jsx';
@@ -17,7 +16,6 @@ import ScrollReveal from './bits/ScrollReveal/ScrollReveal.jsx';
 import ScrollVelocity from './bits/ScrollVelocity/ScrollVelocity.jsx';
 import TextPressure from './bits/TextPressure/TextPressure.jsx';
 import CurvedLoop from './bits/CurvedLoop/CurvedLoop.jsx';
-import VariableProximity from './bits/VariableProximity/VariableProximity.jsx';
 import TrueFocus from './bits/TrueFocus/TrueFocus.jsx';
 import CircularText from './bits/CircularText/CircularText.jsx';
 import TextType from './bits/TextType/TextType.jsx';
@@ -26,22 +24,16 @@ import ClickSpark from './bits/ClickSpark/ClickSpark.jsx';
 import Magnet from './bits/Magnet/Magnet.jsx';
 import StarBorder from './bits/StarBorder/StarBorder.jsx';
 import GradualBlur from './bits/GradualBlur/GradualBlur.jsx';
-import LogoLoop from './bits/LogoLoop/LogoLoop.jsx';
 import FadeContent from './bits/FadeContent/FadeContent.jsx';
-import GlareHover from './bits/GlareHover/GlareHover.jsx';
-import ElectricBorder from './bits/ElectricBorder/ElectricBorder.jsx';
 import Noise from './bits/Noise/Noise.jsx';
-import Cubes from './bits/Cubes/Cubes.jsx';
 import MetaBalls from './bits/MetaBalls/MetaBalls.jsx';
 
 import SpotlightCard from './bits/SpotlightCard/SpotlightCard.jsx';
 import ScrollStack, { ScrollStackItem } from './bits/ScrollStack/ScrollStack.jsx';
 import Dock from './bits/Dock/Dock.jsx';
-import BorderGlow from './bits/BorderGlow/BorderGlow.jsx';
 import SpecularButton from './bits/SpecularButton/SpecularButton.jsx';
 import CardSwap, { Card } from './bits/CardSwap/CardSwap.jsx';
 import Counter from './bits/Counter/Counter.jsx';
-import PixelCard from './bits/PixelCard/PixelCard.jsx';
 import Folder from './bits/Folder/Folder.jsx';
 
 import HoldButton from './bits/HoldButton/HoldButton.jsx';
@@ -88,7 +80,14 @@ const DOCK = [
   { label: 'Contact', icon: <Icon d="M3 6h18v12H3zM3 7l9 7 9-7" />, onClick: () => go('contact') }
 ];
 
-const DISCIPLINES = ['Product design', 'Brand systems', 'Motion', 'Creative code', 'WebGL', 'Design systems', 'Prototyping', 'Front-end'];
+const CRAFT = [
+  ['Product design', 'Flows, screens and systems for web and mobile products, from first sketch to shipped build.', ['Web', 'Mobile'], 'M4 5h16v11H4zM9 20h6M12 16v4'],
+  ['Brand systems', 'Identity that survives contact with real interfaces: type, colour, voice and motion rules.', ['Identity', 'Guidelines'], 'M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12v9M12 12L4 7.5'],
+  ['Motion design', 'Transitions with a purpose and a budget. Springs where things are held, curves where they are sent.', ['Interaction', 'Prototypes'], 'M3 17c4 0 4-10 9-10s5 10 9 10'],
+  ['Creative code', 'Shaders, canvas and generative systems for when a static picture is not enough.', ['Canvas', 'Shaders'], 'M8 7l-5 5 5 5M16 7l5 5-5 5M13.5 4l-3 16'],
+  ['Design systems', 'Tokens, components and documentation that engineers actually want to use.', ['Tokens', 'Components'], 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z'],
+  ['3D and WebGL', 'Real depth in the browser, tuned to stay smooth on a mid-range laptop.', ['Three.js', 'Performance'], 'M12 3l8 4.5v9L12 21l-8-4.5v-9zM4 7.5l8 4.5 8-4.5']
+];
 
 const STEPS = [
   ['01', 'Listen', 'A week of questions before a single pixel. We learn the product, the people using it and what a good day looks like for them.'],
@@ -100,17 +99,29 @@ const STEPS = [
 const WORK = [
   ['Aster', 'Banking app', `linear-gradient(135deg, ${ORCHID}, #4b1d8f)`],
   ['Fieldnotes', 'Journaling tool', `linear-gradient(135deg, ${AMBER}, ${CORAL})`],
-  ['Tidal', 'Music player', 'linear-gradient(135deg, #2dd4bf, #1e3a8a)'],
+  ['Tidal', 'Music player', `linear-gradient(135deg, ${AMBER}, ${ORCHID})`],
   ['Orbit', 'Analytics suite', `linear-gradient(135deg, ${CORAL}, #7a1f4f)`]
 ];
 
-function CapBody({ n, title, children }) {
+function CraftCard({ n, title, text, tags, icon }) {
   return (
-    <div className="cap">
-      <span className="cap-n">{n}</span>
-      <h3>{title}</h3>
-      <p>{children}</p>
-    </div>
+    <SpotlightCard className="cap-card" spotlightColor="rgba(255,179,71,.28)" spotlightSize={320}>
+      <div className="cap">
+        <div className="cap-top">
+          <span className="cap-icon">
+            <Icon d={icon} />
+          </span>
+          <span className="cap-n">{n}</span>
+        </div>
+        <h3>{title}</h3>
+        <p>{text}</p>
+        <ul className="cap-tags">
+          {tags.map(t => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+      </div>
+    </SpotlightCard>
   );
 }
 
@@ -126,7 +137,6 @@ function Tile({ name, children, wide }) {
 }
 
 export default function App() {
-  const vpRef = useRef(null);
   const [clicks, setClicks] = useState(0);
   const [status, setStatus] = useState('running');
   const nextStatus = () => setStatus(s => (s === 'running' ? 'done' : s === 'done' ? 'failed' : 'running'));
@@ -193,19 +203,6 @@ export default function App() {
           </div>
         </header>
 
-        {/* ---------- disciplines ---------- */}
-        <section className="band">
-          <Safe name="LogoLoop">
-            <LogoLoop
-              logos={DISCIPLINES.map(t => ({ node: <span className="disc">{t}</span>, title: t }))}
-              speed={60}
-              gap={64}
-              logoHeight={26}
-              fadeOut
-              ariaLabel="What we do"
-            />
-          </Safe>
-        </section>
         <Safe name="ScrollVelocity">
           <ScrollVelocity texts={['Motion with meaning ✦', 'Design you can feel ✦']} velocity={55} className="vel" numCopies={6} />
         </Safe>
@@ -218,19 +215,6 @@ export default function App() {
               Good interfaces are felt before they are understood. We sweat the half second between a click and its answer, because that is where trust gets built.
             </ScrollReveal>
           </Safe>
-          <div ref={vpRef} className="vp-wrap">
-            <Safe name="VariableProximity" fallback={<span className="vp">Move your cursor across this line.</span>}>
-              <VariableProximity
-                label="Move your cursor across this line."
-                className="vp"
-                fromFontVariationSettings="'wght' 300, 'opsz' 14"
-                toFontVariationSettings="'wght' 1000, 'opsz' 60"
-                containerRef={vpRef}
-                radius={130}
-                falloff="linear"
-              />
-            </Safe>
-          </div>
         </section>
 
         {/* ---------- craft ---------- */}
@@ -238,46 +222,16 @@ export default function App() {
           <FadeContent blur duration={0.9}>
             <p className="eyebrow">Craft</p>
             <h2>
-              Six things we do, on <GradientText colors={[AMBER, CORAL, ORCHID, AMBER]} animationSpeed={6} className="gt">six different surfaces</GradientText>
+              Six disciplines, <GradientText colors={[AMBER, CORAL, AMBER]} animationSpeed={6} className="gt">one team</GradientText>
             </h2>
-            <p className="sub">Hover each card. No two of them react the same way.</p>
+            <p className="sub">Design, motion and code sit at the same table, so nothing gets lost between them.</p>
           </FadeContent>
           <div className="caps">
-            <Safe name="SpotlightCard">
-              <SpotlightCard className="cap-card" spotlightColor="rgba(255,179,71,.35)" spotlightSize={300}>
-                <CapBody n="01" title="Product design">Flows, screens and systems for web and mobile products, from first sketch to shipped build.</CapBody>
-              </SpotlightCard>
-            </Safe>
-            <Safe name="BorderGlow">
-              <BorderGlow className="cap-card" backgroundColor="#120d17" borderRadius={24} colors={[AMBER, CORAL, ORCHID]} glowRadius={44}>
-                <CapBody n="02" title="Brand systems">Identity that survives contact with real interfaces: type, colour, voice and motion rules.</CapBody>
-              </BorderGlow>
-            </Safe>
-            <Safe name="ElectricBorder">
-              <ElectricBorder color={AMBER} borderRadius={24} chaos={0.45} thickness={1.4} className="cap-card cap-plain">
-                <CapBody n="03" title="Motion design">Transitions with a purpose and a budget. Springs where things are held, curves where they are sent.</CapBody>
-              </ElectricBorder>
-            </Safe>
-            <Safe name="PixelCard">
-              <PixelCard variant="default" colors={`${ORCHID},${CORAL},${AMBER}`} className="cap-card cap-pixel" radius={24}>
-                <div className="cap-over">
-                  <CapBody n="04" title="Creative code">Shaders, canvas and generative systems when a static picture is not enough.</CapBody>
-                </div>
-              </PixelCard>
-            </Safe>
-            <Safe name="GlareHover">
-              <GlareHover width="100%" height="100%" background="#120d17" borderRadius="24px" borderColor="rgba(255,255,255,.1)" glareColor="#ffffff" glareOpacity={0.35} className="cap-card">
-                <CapBody n="05" title="Design systems">Tokens, components and documentation that engineers actually want to use.</CapBody>
-              </GlareHover>
-            </Safe>
-            <div className="cap-card cap-cubes">
-              <div className="cubes-stage">
-                <Safe name="Cubes">
-                  <Cubes gridSize={7} faceColor="#150f1b" edgeColor={CORAL} rippleColor={AMBER} maxAngle={50} radius={3} />
-                </Safe>
-              </div>
-              <CapBody n="06" title="3D and WebGL">Real depth in the browser, tuned to stay smooth on a mid-range laptop.</CapBody>
-            </div>
+            {CRAFT.map(([title, text, tags, icon], i) => (
+              <Safe name="SpotlightCard" key={title}>
+                <CraftCard n={`0${i + 1}`} title={title} text={text} tags={tags} icon={icon} />
+              </Safe>
+            ))}
           </div>
         </section>
 
@@ -291,8 +245,8 @@ export default function App() {
           <div className="wrap stats">
             <div>
               <b>
-                <Safe name="CountUp" fallback="48">
-                  <CountUp to={48} duration={2} />
+                <Safe name="CountUp" fallback="40">
+                  <CountUp to={40} duration={2} />
                 </Safe>
               </b>
               <span>live components on this page</span>
@@ -428,7 +382,7 @@ export default function App() {
             </Tile>
             <Tile name="Meta Balls" wide>
               <div className="fill">
-                <MetaBalls color={CORAL} cursorBallColor={AMBER} ballCount={12} animationSize={26} enableTransparency speed={0.35} />
+                <MetaBalls color={AMBER} cursorBallColor={CORAL} ballCount={12} animationSize={26} enableTransparency speed={0.35} />
               </div>
             </Tile>
             <Tile name="Text Type" wide>
@@ -442,11 +396,6 @@ export default function App() {
           <div className="fill">
             <Safe name="Threads">
               <Threads color={[1, 0.62, 0.3]} amplitude={1.5} distance={0.35} lineCount={70} enableMouseInteraction />
-            </Safe>
-          </div>
-          <div className="orb">
-            <Safe name="Orb">
-              <Orb colors={[ORCHID, CORAL, AMBER]} backgroundColor="#0a070d" glow={1.1} />
             </Safe>
           </div>
           <div className="wrap rel contact-in">

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deskling</title>
+<meta name="description" content="Deskling is a tiny figurine that lives on your desktop and keeps you on track. Focus timer, tasks, reminders and streaks for Windows, macOS and Linux.">
+<meta name="theme-color" content="#151933">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=Pixelify+Sans:wght@500;700&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: the page is the figurine's desk at night. Navy room, one warm desk line,
+   and the characters are the only bright things on it. Pixel type for headings, because
+   every character also comes as a 32x32 sprite. */
+:root{
+  --bg:#151933; --panel:#1d2244; --panel-2:#252b55; --line:rgba(255,255,255,.1); --line-2:rgba(255,255,255,.2);
+  --ink:#eef1ff; --muted:#9ea7cf; --cyan:#3df0ff; --orange:#ff8a2a; --go:#7dffb0;
+  --pixel:"Pixelify Sans","Courier New",monospace; --body:"Figtree",system-ui,sans-serif; --ease:cubic-bezier(.23,1,.32,1);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--cyan);outline-offset:3px;border-radius:8px}
+.wrap{max-width:1080px;margin:0 auto;padding-inline:24px}
+h1,h2,h3{font-family:var(--pixel);font-weight:700;margin:0;line-height:1.05;letter-spacing:-.01em;text-wrap:balance}
+h2{font-size:clamp(2rem,4.6vw,3.1rem)}
+.kick{font:600 .78rem var(--body);letter-spacing:.16em;text-transform:uppercase;color:var(--cyan);margin:0 0 14px}
+.lede{color:var(--muted);max-width:54ch;margin:14px 0 0}
+section{padding-block:92px}
+.btn{display:inline-flex;align-items:center;gap:9px;font:600 1rem/1 var(--body);padding:14px 22px;border-radius:12px;border:1px solid var(--line-2);background:transparent;color:var(--ink);text-decoration:none;cursor:pointer;transition:transform .16s var(--ease),background-color .2s ease,border-color .2s ease}
+.btn:active{transform:scale(.97)}
+.btn.go{background:var(--cyan);border-color:var(--cyan);color:#06222a}
+.btn.sm{padding:10px 16px;font-size:.92rem}
+@media (hover:hover){.btn:hover{background:rgba(255,255,255,.08)}.btn.go:hover{background:#7af6ff}}
+
+/* figurines (rendered by the app's own characters.js) */
+.fig{transform-origin:50% 100%;animation:breathe 3.6s ease-in-out infinite}
+.fig.floats{animation:float 3.2s ease-in-out infinite}
+.fig svg,.fig canvas{width:100%;height:100%;display:block}
+.fig canvas{image-rendering:pixelated}
+.fig[data-look="neon"] svg{filter:drop-shadow(0 0 2.5px var(--glow))}
+.fig[data-look="soft"] svg{filter:drop-shadow(0 3px 2px rgba(10,14,40,.28))}
+.fig svg .f{transform:translate(calc(var(--lx,0) * 1px),calc(var(--ly,0) * 1px));transition:transform .2s ease-out}
+.fig svg [class^="pt-"]{transform-box:fill-box}
+.pt-tail{transform-origin:0% 100%;animation:wag 1.5s ease-in-out infinite alternate}
+[data-expr="happy"] .pt-tail,[data-expr="wow"] .pt-tail{animation-duration:.2s}
+.pt-earL{transform-origin:85% 100%;animation:twitch 5.5s ease-in-out infinite}
+.pt-earR{transform-origin:15% 100%;animation:twitch 7s ease-in-out 1.3s infinite reverse}
+.pt-flopL{transform-origin:90% 5%;animation:flop 3.2s ease-in-out infinite}
+.pt-flopR{transform-origin:10% 5%;animation:flop 3.2s ease-in-out .2s infinite reverse}
+.pt-lamp{animation:lamp 1.8s ease-in-out infinite}
+[data-expr="focus"] .pt-lamp{animation-duration:.7s}
+.pt-tongue{opacity:0;transform-origin:50% 0}
+[data-expr="happy"] .pt-tongue,[data-expr="wow"] .pt-tongue{opacity:1;animation:pant .22s ease-in-out infinite alternate}
+.fig.hop{animation:hop .5s cubic-bezier(.3,1.6,.6,1) 2}
+@keyframes breathe{50%{transform:scale(1.025,.975)}}
+@keyframes float{50%{transform:translateY(-5px)}}
+@keyframes hop{40%{transform:translateY(-14px) scale(.96,1.05)}}
+@keyframes wag{from{transform:rotate(-9deg)}to{transform:rotate(14deg)}}
+@keyframes twitch{0%,86%,100%{transform:none}90%{transform:rotate(-13deg)}95%{transform:rotate(5deg)}}
+@keyframes flop{0%,70%,100%{transform:none}80%{transform:rotate(9deg)}90%{transform:rotate(-4deg)}}
+@keyframes lamp{50%{opacity:.3}}
+@keyframes pant{to{transform:scaleY(1.3)}}
+
+nav{position:sticky;top:0;z-index:20;background:rgba(21,25,51,.82);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+nav .wrap{display:flex;align-items:center;gap:24px;padding-block:12px}
+.logo{display:flex;align-items:center;gap:10px;font:700 1.45rem var(--pixel);text-decoration:none;margin-right:auto}
+.logo .fig{width:34px;height:34px;animation:none}
+nav a.l{color:var(--muted);text-decoration:none;font-size:.94rem}
+
+/* hero */
+.hero{padding-block:64px 0;text-align:center;position:relative}
+.hero h1{font-size:clamp(2.6rem,7.4vw,5.4rem)}
+.hero h1 em{font-style:normal;color:var(--cyan)}
+.hero p{font-size:1.15rem;color:var(--muted);max-width:50ch;margin:22px auto 30px}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.os{margin-top:16px;font-size:.86rem;color:var(--muted)}
+.desk{position:relative;margin-top:56px;height:290px;display:flex;align-items:flex-end;justify-content:center}
+.desk::after{content:"";position:absolute;left:0;right:0;bottom:0;height:64px;border-top:3px solid var(--orange);background:linear-gradient(rgba(255,138,42,.14),transparent)}
+.pet{position:relative;z-index:2;width:176px;height:176px;margin-bottom:60px;background:none;border:0;padding:0;cursor:pointer}
+.pet .fig{width:100%;height:100%}
+.bubble{position:absolute;z-index:3;left:50%;bottom:252px;transform:translateX(-50%);background:var(--ink);color:#151933;font-weight:600;font-size:.95rem;border-radius:14px;padding:9px 15px;white-space:nowrap;transition:opacity .25s ease,transform .25s var(--ease)}
+.bubble::after{content:"";position:absolute;left:50%;bottom:-6px;width:12px;height:12px;background:var(--ink);transform:translateX(-50%) rotate(45deg)}
+.timer{position:absolute;z-index:3;left:50%;bottom:26px;transform:translateX(-50%);font:700 1.25rem var(--pixel);background:var(--panel-2);border:1px solid var(--line-2);border-radius:99px;padding:3px 16px;font-variant-numeric:tabular-nums}
+.timer[hidden]{display:none}
+
+/* picker */
+.picker{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;margin-top:40px}
+.box{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:24px}
+.box h3{font-size:1.2rem;margin-bottom:14px}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.opt{display:flex;flex-direction:column;align-items:center;gap:6px;font:600 .9rem var(--body);color:var(--ink);background:var(--panel-2);border:2px solid transparent;border-radius:16px;padding:12px 14px;cursor:pointer;min-width:84px;transition:border-color .2s ease,transform .16s var(--ease)}
+.opt:active{transform:scale(.97)}
+.opt .fig{width:52px;height:52px;animation:none}
+.opt[aria-pressed="true"]{border-color:var(--cyan)}
+.opt.txt{flex-direction:row;min-width:0;padding:12px 18px}
+
+/* features */
+.feats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:44px}
+.feat{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:26px;transition:border-color .2s ease,transform .25s var(--ease)}
+.feat b{display:block;font:700 1.35rem var(--pixel);margin-bottom:8px}
+.feat span{color:var(--muted);font-size:.98rem}
+.feat i{display:block;width:34px;height:6px;border-radius:99px;background:var(--cyan);margin-bottom:18px}
+.feat:nth-child(3n+2) i{background:var(--orange)}.feat:nth-child(3n) i{background:var(--go)}
+@media (hover:hover){.feat:hover{border-color:var(--line-2);transform:translateY(-3px)}}
+
+/* cast */
+.cast{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:44px}
+.member{border:1px solid var(--line);border-radius:20px;background:var(--panel);padding:20px 16px;text-align:center}
+.member .looks{display:flex;justify-content:center;gap:8px;margin-bottom:14px}
+.member .fig{width:58px;height:58px}
+.member b{display:block;font:700 1.4rem var(--pixel)}
+.member span{color:var(--muted);font-size:.9rem}
+
+/* light + install */
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;align-items:start}
+.light{list-style:none;margin:28px 0 0;padding:0;display:grid;gap:14px}
+.light li{padding-left:24px;position:relative;color:#d3d8f2}
+.light li::before{content:"";position:absolute;left:0;top:.6em;width:10px;height:10px;background:var(--go)}
+pre{margin:18px 0 0;background:#0e1126;border:1px solid var(--line);border-radius:14px;padding:18px 20px;font:400 .92rem/1.8 ui-monospace,Menlo,Consolas,monospace;overflow-x:auto;color:#cfd6ff}
+pre i{font-style:normal;color:var(--muted)}
+.steps{margin:20px 0 0;padding-left:20px;color:#d3d8f2}
+.steps li{margin-bottom:8px}
+
+footer{border-top:1px solid var(--line);padding-block:24px;color:var(--muted);font-size:.88rem}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+
+@media (max-width:860px){.picker,.two{grid-template-columns:1fr}.feats{grid-template-columns:1fr}.cast{grid-template-columns:repeat(2,minmax(0,1fr))}nav a.l{display:none}section{padding-block:68px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<nav><div class="wrap">
+  <a class="logo" href="#top"><span class="fig" id="logoFig"></span>Deskling</a>
+  <a class="l" href="#pick">Characters</a><a class="l" href="#features">Features</a><a class="l" href="#install">Install</a>
+  <a class="btn sm" href="https://github.com/Abhiram-awsd/Deskling">GitHub</a>
+</div></nav>
+
+<main id="top">
+<div class="hero"><div class="wrap">
+  <h1>A tiny figurine that <em>keeps you on track.</em></h1>
+  <p>Deskling lives on your desktop. It runs your focus sessions, holds today's tasks and reminds you to drink water, without ever getting in the way.</p>
+  <div class="cta">
+    <a class="btn go" href="https://github.com/Abhiram-awsd/Deskling/releases">Download Deskling</a>
+    <button class="btn" type="button" id="focusBtn">Try a 10-second focus session</button>
+  </div>
+  <p class="os">Free and open source. Windows, macOS and Linux.</p>
+  <div class="desk" id="desk">
+    <span class="bubble" id="bubble">Hi. Move your pointer around.</span>
+    <button class="pet" type="button" id="pet" aria-label="Poke the figurine"><span class="fig" id="hero"></span></button>
+    <span class="timer" id="timer" hidden>0:10</span>
+  </div>
+</div></div>
+
+<section id="pick" style="padding-top:64px"><div class="wrap">
+  <p class="kick">Make it yours</p>
+  <h2>4 characters, 3 looks</h2>
+  <p class="lede">Pick one here and the figurine on the desk above changes with it. In the app, tails wag, ears twitch and lamps blink.</p>
+  <div class="picker">
+    <div class="box"><h3>Character</h3><div class="row" id="chars"></div></div>
+    <div class="box"><h3>Look</h3><div class="row" id="looks"></div></div>
+  </div>
+  <div class="cast" id="cast"></div>
+</div></section>
+
+<section id="features" style="padding-top:0"><div class="wrap">
+  <p class="kick">What it does</p>
+  <h2>Small helper, full day</h2>
+  <div class="feats">
+    <div class="feat"><i></i><b>Focus timer</b><span>Pomodoro sessions with short and long breaks. The countdown sits right under the figurine.</span></div>
+    <div class="feat"><i></i><b>Tasks</b><span>A short list for today, plus the one thing that would make the day a win.</span></div>
+    <div class="feat"><i></i><b>Reminders</b><span>Water, stretch, eye rest and posture. They wait until your focus session ends.</span></div>
+    <div class="feat"><i></i><b>Days</b><span>Your streak, focus minutes for the last seven days and today's tally.</span></div>
+    <div class="feat"><i></i><b>Check-ins</b><span>A morning check-in to set the day up and an evening recap to close it.</span></div>
+    <div class="feat"><i></i><b>Three ways to live</b><span>It sits where you drag it, walks along the bottom of the screen, or hides in the tray until needed.</span></div>
+  </div>
+</div></section>
+
+<section id="install" style="padding-top:0"><div class="wrap two">
+  <div>
+    <p class="kick">Why it is light</p>
+    <h2>Barely there</h2>
+    <ul class="light">
+      <li>Built on Tauri, so it uses the webview your system already has instead of bundling a browser.</li>
+      <li>One small window that is only ever as big as what is on screen.</li>
+      <li>No framework, no bundler and no image files. Every character is drawn from about 100 lines of shape data.</li>
+      <li>No timers of its own while idle. The shell sends one tick a second.</li>
+      <li>Everything is stored locally. No account and no network requests.</li>
+    </ul>
+  </div>
+  <div>
+    <p class="kick">Install</p>
+    <h2>Get it running</h2>
+    <ol class="steps">
+      <li>Download the installer for your system from the Releases page.</li>
+      <li>Open it. Deskling appears on your desktop.</li>
+      <li>Click the figurine to open the panel. Drag it to move it.</li>
+    </ol>
+    <pre><i># or build from source (needs Rust and Node.js)</i>
+npm install
+npm run dev</pre>
+    <div class="cta" style="justify-content:flex-start;margin-top:22px"><a class="btn go" href="https://github.com/Abhiram-awsd/Deskling/releases">Go to Releases</a><a class="btn" href="https://github.com/Abhiram-awsd/Deskling">View the source</a></div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap"><span>Deskling is open source.</span><span>Made by <a href="../../">Abhiram Appani</a></span></div></footer>
+
+<script src="characters.js"></script>
+<script>
+/* The figurines on this page are drawn by Deskling's own characters.js, the same file the app ships. */
+const $ = s => document.querySelector(s);
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const { CHARS, mount } = window.Buddy;
+const LOOKS = [["soft","Soft"],["pixel","Pixel"],["neon","Neon"]];
+let char = CHARS[0].id, look = "soft", busy = false;
+
+const hero = mount($("#hero"), {char, look, expr:"idle"});
+mount($("#logoFig"), {char:CHARS[0].id, look:"soft", expr:"idle"});
+const say = t => $("#bubble").textContent = t;
+function mood(expr, ms){ hero.set({expr}); if (ms) setTimeout(() => { if (!busy) hero.set({expr:"idle"}); }, ms); }
+
+/* pickers */
+$("#chars").innerHTML = CHARS.map(c => `<button class="opt" type="button" data-c="${c.id}"><span class="fig"></span>${c.name}</button>`).join("");
+$("#looks").innerHTML = LOOKS.map(([k,n]) => `<button class="opt txt" type="button" data-l="${k}">${n}</button>`).join("");
+const minis = [...$("#chars").children].map(b => mount(b.firstChild, {char:b.dataset.c, look, expr:"idle"}));
+function paint(){
+  [...$("#chars").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.c === char));
+  [...$("#looks").children].forEach(b => b.setAttribute("aria-pressed", b.dataset.l === look));
+  hero.set({char, look}); minis.forEach(m => m.set({look}));
+}
+$("#chars").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; char = b.dataset.c; paint(); const c = CHARS.find(x => x.id === char); say(`I'm ${c.name} the ${c.kind}.`); mood("happy", 1400); });
+$("#looks").addEventListener("click", e => { const b = e.target.closest("button"); if (!b) return; look = b.dataset.l; paint(); say(`${b.textContent} look. Nice choice.`); mood("wow", 1200); });
+paint();
+
+/* the whole cast, every look */
+$("#cast").innerHTML = CHARS.map(c => `<div class="member"><div class="looks">${LOOKS.map(([k]) => `<span class="fig" data-c="${c.id}" data-k="${k}"></span>`).join("")}</div><b>${c.name}</b><span>the ${c.kind}</span></div>`).join("");
+document.querySelectorAll("#cast .fig").forEach(el => mount(el, {char:el.dataset.c, look:el.dataset.k, expr:"idle"}));
+
+/* eyes follow the pointer, and it blinks now and then */
+if (!reduce){
+  addEventListener("pointermove", e => { const r = $("#hero").getBoundingClientRect(), dx = e.clientX - (r.left + r.width/2), dy = e.clientY - (r.top + r.height/2), d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 260) * 1.7;
+    $("#hero").style.setProperty("--lx", (dx / d * k).toFixed(2)); $("#hero").style.setProperty("--ly", (dy / d * k * .7).toFixed(2)); }, {passive:true});
+  setInterval(() => { if (!busy && hero.get().expr === "idle"){ hero.set({expr:"blink"}); setTimeout(() => { if (hero.get().expr === "blink") hero.set({expr:"idle"}); }, 160); } }, 3800);
+}
+
+/* poke it */
+const LINES = ["Hey!", "That tickles.", "Back to work, you.", "Have you had water today?", "One thing at a time."];
+let poke = 0;
+$("#pet").addEventListener("click", () => { if (busy) return; const f = $("#hero"); f.classList.remove("hop"); void f.offsetWidth; if (!reduce) f.classList.add("hop"); say(LINES[poke++ % LINES.length]); mood("happy", 1300); });
+$("#hero").addEventListener("animationend", e => { if (e.animationName === "hop") $("#hero").classList.remove("hop"); });
+
+/* a ten-second focus session */
+$("#focusBtn").addEventListener("click", () => {
+  if (busy) return; busy = true; let left = 10; const t = $("#timer"), btn = $("#focusBtn");
+  btn.disabled = true; btn.textContent = "Focusing..."; t.hidden = false; t.textContent = "0:10"; hero.set({expr:"focus"}); say("Focus time. I'll keep watch.");
+  const iv = setInterval(() => { left--; t.textContent = "0:" + String(left).padStart(2, "0");
+    if (left <= 0){ clearInterval(iv); busy = false; t.hidden = true; btn.disabled = false; btn.textContent = "Try another focus session"; say("Done. Take a short break."); mood("happy", 2600);
+      const f = $("#hero"); if (!reduce){ f.classList.remove("hop"); void f.offsetWidth; f.classList.add("hop"); } } }, 1000);
+});
+</script>
+</body>
+</html>
