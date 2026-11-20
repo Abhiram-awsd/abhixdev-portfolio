@@ -16,6 +16,7 @@ It is a static site with no build step: plain HTML, CSS and JavaScript.
 | `lumen-src/` | React + Vite source for the Lumen site |
 | `work/kuppi/` | Concept: coffee storefront with dynamic theming and a cart |
 | `work/chillar/` | Concept: app landing page with a working bill splitter |
+| `img/` | Hover previews for the project cards (captures of each site) |
 | `photos/` | Images for the photography section |
 
 The sites under `work/` are concept projects for fictional brands.
